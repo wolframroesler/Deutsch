@@ -40,8 +40,9 @@ static bool key_indicator_text_nrw	= false;	//true = say "viertel x+1" at xx:45
 static bool key_indicator_text_wien	= false;	//true = say "viertel x+1" at xx:15
 static bool key_indicator_date		= true;		//true = show date
 
-// Fuzzy mode is not yet configurable, let's pretend it is
-static const bool key_indicator_fuzzy = true;	// true = don't be too exact about the time
+// The following are not yet configurable, but let's pretend they are:
+static const bool key_indicator_fuzzy = true;			// true = don't be too exact about the time
+static const bool key_indicator_batt_redonly = true;	// true = show battery icon only if red
 
 //Display resolution
 enum {
@@ -73,18 +74,22 @@ static void change_battery_icon(bool charging) {
 
 //Update battery icon or hide it
 static void update_battery(BatteryChargeState charge_state) {
-  if (key_indicator_batt_img) {
+  const bool show = key_indicator_batt_img
+    ? (key_indicator_batt_redonly ? charge_state.charge_percent <= red_percent : true)
+	: false;
+
+  if (show) {
     batteryPercent = charge_state.charge_percent;
-    layer_set_hidden(bitmap_layer_get_layer(battery_image_layer), !key_indicator_batt_img);
-    if(batteryPercent==100 && key_indicator_batt_img) {
+    layer_set_hidden(bitmap_layer_get_layer(battery_image_layer), false);
+    if(batteryPercent==100) {
       change_battery_icon(false);
       layer_set_hidden(bitmap_layer_get_layer(battery_fill_layer), false);
     }
     layer_set_hidden(bitmap_layer_get_layer(battery_fill_layer), charge_state.is_charging);
     change_battery_icon(charge_state.is_charging);
   } else {
-    layer_set_hidden(bitmap_layer_get_layer(battery_fill_layer), !key_indicator_batt_img);
-    layer_set_hidden(bitmap_layer_get_layer(battery_image_layer), !key_indicator_batt_img);
+    layer_set_hidden(bitmap_layer_get_layer(battery_fill_layer), true);
+    layer_set_hidden(bitmap_layer_get_layer(battery_image_layer), true);
   }
 }
 
