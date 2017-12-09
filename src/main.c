@@ -90,11 +90,10 @@ void battery_layer_update_callback(Layer *me, GContext* ctx) {
 }
 
 static void load_battery_layers() {
-#ifdef NOT_YET_MIGRATED_TO_SDKv3
   battery_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY);
   GRect battery_frame = (GRect) {
     .origin = { .x = 3, .y = 2 },
-    .size = battery_image->bounds.size
+    .size = gbitmap_get_bounds(battery_image).size
   };
   battery_fill_layer = bitmap_layer_create(battery_frame);
   battery_image_layer = bitmap_layer_create(battery_frame);
@@ -107,7 +106,6 @@ static void load_battery_layers() {
     battery_state_service_subscribe(&update_battery);
   }
   update_battery(battery_state_service_peek());
-#endif
 }
 
 //Bluetooth
@@ -127,12 +125,11 @@ void bluetooth_connection_callback(bool connected) {  //Bluetooth handler
 }
 
 static void load_bluetooth_layers() {
-#ifdef NOT_YET_MIGRATED_TO_SDKv3
   bluetooth_connected_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH_CONNECTED);
   bluetooth_disconnected_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH_DISCONNECTED);
   GRect bluetooth_frame = (GRect) {
     .origin = { .x = 129, .y = 2 },
-    .size = bluetooth_connected_image->bounds.size
+    .size = gbitmap_get_bounds(bluetooth_connected_image).size
   };
   bluetooth_layer = bitmap_layer_create(bluetooth_frame);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bluetooth_layer));
@@ -143,7 +140,6 @@ static void load_bluetooth_layers() {
   } else {
     layer_set_hidden(bitmap_layer_get_layer(bluetooth_layer), true);
   }
-#endif
 }
 
 //If a Key is changing, do following:
