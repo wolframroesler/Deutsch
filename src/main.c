@@ -1,7 +1,5 @@
 #include <pebble.h>
 
-//Language ID
-//static int langId = 0; //0=de, 1=en, 2=french
 //Window
 static Window *window;
 //Inverter Layer
@@ -37,15 +35,6 @@ static bool key_indicator_batt_img = true; //true = show batt usage image
 static bool key_indicator_text_nrw = false; //true = show batt usage image
 static bool key_indicator_text_wien = false; //true = show batt usage image
 static bool key_indicator_date = true; //true = show date
-
-/*
-//day names
-static const char *wday_names[][7] = {
-  {"So","Mo","Di","Mi","Do","Fr","Sa"}, //DE
-  {"Su","Mo","Tu","We","Th","Fr","Sa"}, //EN
-  {"Di","Lu","Ma","Me","Je","Ve","Sa"} //French
-};
-*/
 
 /*
   ##################################
@@ -278,22 +267,11 @@ static void display_time(struct tm *time) {
     "neun\nvor", "acht\nvor", "sieben\nvor", "sechs\nvor", "fünf\nvor",
     "vier\nvor", "drei\nvor", "zwei\nvor", "eins\nvor" };
   
-  //Special Minute Texts
-  //char minute_text_viertelvor = "Viertel\nvor"; // Viertel vor 11 = 10:45, dreiviertel
-  //char minute_text_viertel = "Viertel"; // Viertel 11 = 10:15, viertel nach HINWEIS hier auch die Stunde nach vorne ziehen
-  
-  //Set Time for DEBUG
-  //int hour = 10;
-  //int min = 47;
-
   // Set Time
   int hour = time->tm_hour;
   int min = time->tm_min;
-  //int wday = time->tm_wday; //weekday: day since sunday
   int mday = time->tm_mday; //day of the month
   int month = time->tm_mon +1; //months since January
-  //DEBUG with second unit
-  //int min = time->tm_sec;
 
   char minute_text[50];
   char hour_text[50];
@@ -356,7 +334,6 @@ static void display_time(struct tm *time) {
   
   // Weekday
   static char staticDateText[16];
-  //snprintf(staticDateText, sizeof(staticDateText), "%s. %i.%i.", wday_names[langId][wday], mday, month);
   snprintf(staticDateText, sizeof(staticDateText), "%i.%i.", mday, month);
   text_layer_set_text(dateLayer, staticDateText);
 }
