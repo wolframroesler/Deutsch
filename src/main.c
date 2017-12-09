@@ -40,6 +40,9 @@ static bool key_indicator_text_nrw	= false;	//true = say "viertel x+1" at xx:45
 static bool key_indicator_text_wien	= false;	//true = say "viertel x+1" at xx:15
 static bool key_indicator_date		= true;		//true = show date
 
+// Fuzzy mode is not yet configurable, let's pretend it is
+static const bool key_indicator_fuzzy = true;	// true = don't be too exact about the time
+
 //Display resolution
 enum {
   XMAX = 144,
@@ -282,9 +285,26 @@ static void display_time(const struct tm *time) {
   
   // Set Time
   const int hour	= time->tm_hour;
-  const int min		= time->tm_min;
+  int       min		= time->tm_min;
   const int mday	= time->tm_mday; //day of the month
   const int month	= time->tm_mon +1; //months since January
+
+  //Fuzzy mode, e. g. say "fünf nach drei" when it's actually already 15:07.
+  if (key_indicator_fuzzy) {
+	static const int delta[] = {
+		0,		// 0
+		-1,		// 1
+		-2,		// 2
+		2,		// 3
+		1,		// 4
+		0,		// 5
+		-1,		// 6
+		-2,		// 7
+		2,		// 8
+		1		// 9
+	};
+	min += delta[min%10];
+  }
   
   // Minute Text
   char minute_text[50];
