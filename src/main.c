@@ -49,6 +49,10 @@ enum {
   YMAX = 168
  };
 
+//Battery icon will be red if charge is <= this percentage
+//(could be configurable in the future)
+static const int red_percent = 10;
+
 /*
   ##################################
   ######## Custom Functions ########
@@ -86,8 +90,9 @@ static void update_battery(BatteryChargeState charge_state) {
 
 //draw the remaining battery percentage
 static void battery_layer_update_callback(Layer *me, GContext* ctx) {
-  graphics_context_set_stroke_color(ctx, GColorWhite);
-  graphics_context_set_fill_color(ctx, GColorWhite);
+  const GColor color = batteryPercent <= red_percent ? GColorRed : GColorWhite;
+  graphics_context_set_stroke_color(ctx, color);
+  graphics_context_set_fill_color(ctx, color);
   graphics_fill_rect(ctx, GRect(2, 2, ((batteryPercent/100.0)*11.0), 5), 0, GCornerNone);
 }
 
