@@ -2,21 +2,25 @@
 
 //Window
 static Window *window;
+
 //Inverter Layer
 #ifdef NOT_YET_MIGRATED_TO_SDKv3
 static InverterLayer *inv_layer;
 #endif
+
 //Bluetooth
 static GBitmap *bluetooth_connected_image, *bluetooth_disconnected_image; //Bluetooth images
 static BitmapLayer *bluetooth_layer; //Bluetooth layer
+
 //Battery
 static uint8_t batteryPercent; //for calculating fill state
 static GBitmap *battery_image;
 static BitmapLayer *battery_image_layer, *battery_fill_layer; //battery icon, show fill status
+
 //Text Lines
 static TextLayer *minuteLayer_2longlines, *minuteLayer_3lines, *minuteLayer_2biglines, *hourLayer, *dateLayer;
 
-//Set key ID´s
+//Set key IDs
 enum {
   KEY_INVERTED = 0,
   KEY_BLUETOOTH = 1,
@@ -28,13 +32,13 @@ enum {
 };
 
 //Default key values
-static bool key_indicator_inverted = false; //true = white background
-static bool key_indicator_bluetooth = true; //true = bluetooth icon on
-static bool key_indicator_vibe = true; //true = vibe on bluetooth disconnect
-static bool key_indicator_batt_img = true; //true = show batt usage image
-static bool key_indicator_text_nrw = false; //true = show batt usage image
-static bool key_indicator_text_wien = false; //true = show batt usage image
-static bool key_indicator_date = true; //true = show date
+static bool key_indicator_inverted	= false;	//true = white background
+static bool key_indicator_bluetooth	= true;		//true = bluetooth icon on
+static bool key_indicator_vibe 		= true;		//true = vibe on bluetooth disconnect
+static bool key_indicator_batt_img	= true;		//true = show batt usage image
+static bool key_indicator_text_nrw	= false;	//true = say "viertel x+1" at xx:45
+static bool key_indicator_text_wien	= false;	//true = say "viertel x+1" at xx:15
+static bool key_indicator_date		= true;		//true = show date
 
 /*
   ##################################
@@ -43,7 +47,7 @@ static bool key_indicator_date = true; //true = show date
 */
 
 //Battery - set image if charging, or set empty battery image if not charging
-void change_battery_icon(bool charging) {
+static void change_battery_icon(bool charging) {
   gbitmap_destroy(battery_image);
   if(charging) {
     battery_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY_CHARGE);
@@ -72,7 +76,7 @@ static void update_battery(BatteryChargeState charge_state) {
 }
 
 //draw the remaining battery percentage
-void battery_layer_update_callback(Layer *me, GContext* ctx) {
+static void battery_layer_update_callback(Layer *me, GContext* ctx) {
   graphics_context_set_stroke_color(ctx, GColorWhite);
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_rect(ctx, GRect(2, 2, ((batteryPercent/100.0)*11.0), 5), 0, GCornerNone);
@@ -109,7 +113,7 @@ static void toggle_bluetooth_icon(bool connected) { // Toggle bluetooth
   }
 }
 
-void bluetooth_connection_callback(bool connected) {  //Bluetooth handler
+static void bluetooth_connection_callback(bool connected) {  //Bluetooth handler
   toggle_bluetooth_icon(connected);
 }
 
@@ -132,7 +136,7 @@ static void load_bluetooth_layers() {
 }
 
 //If a Key is changing, do following:
-void process_tuple(Tuple *t) {
+static void process_tuple(Tuple *t) {
   switch(t->key) {
     //Inverter Layer
     case KEY_INVERTED: {
@@ -186,14 +190,14 @@ void process_tuple(Tuple *t) {
 }
 
 //If a Key is changing, call process_tuple
-void in_received_handler(DictionaryIterator *iter, void *context) {
+static void in_received_handler(DictionaryIterator *iter, void *context) {
 	for(Tuple *t=dict_read_first(iter); t!=NULL; t=dict_read_next(iter))
     process_tuple(t);
 }
 
 //Create Inverter Layer
 #ifdef NOT_YET_MIGRATED_TO_SDKv3
-void load_inv_layer() {
+static void load_inv_layer() {
   inv_layer = inverter_layer_create((GRect) {.origin = {0, 0}, .size = {144, 168}});
   layer_add_child(window_get_root_layer(window), inverter_layer_get_layer(inv_layer));
   if (key_indicator_inverted)
@@ -237,7 +241,6 @@ static void load_text_layers() {
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(hourLayer));
   
   // Configure DateLayer
-  //dateLayer = text_layer_create((GRect) { .origin = {45, -7}, .size = {144-40, 168}});
   dateLayer = text_layer_create((GRect) { .origin = {57, -7}, .size = {144-40, 168}});
   text_layer_set_text_color(dateLayer, GColorWhite);
   text_layer_set_background_color(dateLayer, GColorClear);
@@ -354,13 +357,13 @@ static void window_load(Window *window) {
 	app_message_open(512, 512); //Key buffer in- and outbound
   
   //Load value from storage, if storage is empty load default value
-  key_indicator_inverted = persist_exists(KEY_INVERTED) ? persist_read_bool(KEY_INVERTED) : key_indicator_inverted;
-  key_indicator_bluetooth = persist_exists(KEY_BLUETOOTH) ? persist_read_bool(KEY_BLUETOOTH) : key_indicator_bluetooth;
-  key_indicator_vibe = persist_exists(KEY_VIBE) ? persist_read_bool(KEY_VIBE) : key_indicator_vibe;
-  key_indicator_batt_img = persist_exists(KEY_BATT_IMG) ? persist_read_bool(KEY_BATT_IMG) : key_indicator_batt_img;
-  key_indicator_text_nrw = persist_exists(KEY_TEXT_NRW) ? persist_read_bool(KEY_TEXT_NRW) : key_indicator_text_nrw;
-  key_indicator_text_wien = persist_exists(KEY_TEXT_WIEN) ? persist_read_bool(KEY_TEXT_WIEN) : key_indicator_text_wien;
-  key_indicator_date = persist_exists(KEY_DATE) ? persist_read_bool(KEY_DATE) : key_indicator_date;
+  key_indicator_inverted =	persist_exists(KEY_INVERTED) 	? persist_read_bool(KEY_INVERTED) 	: key_indicator_inverted;
+  key_indicator_bluetooth =	persist_exists(KEY_BLUETOOTH)	? persist_read_bool(KEY_BLUETOOTH) 	: key_indicator_bluetooth;
+  key_indicator_vibe =		persist_exists(KEY_VIBE) 		? persist_read_bool(KEY_VIBE) 		: key_indicator_vibe;
+  key_indicator_batt_img =	persist_exists(KEY_BATT_IMG) 	? persist_read_bool(KEY_BATT_IMG) 	: key_indicator_batt_img;
+  key_indicator_text_nrw =	persist_exists(KEY_TEXT_NRW) 	? persist_read_bool(KEY_TEXT_NRW) 	: key_indicator_text_nrw;
+  key_indicator_text_wien =	persist_exists(KEY_TEXT_WIEN) 	? persist_read_bool(KEY_TEXT_WIEN)	: key_indicator_text_wien;
+  key_indicator_date =		persist_exists(KEY_DATE) 		? persist_read_bool(KEY_DATE) 		: key_indicator_date;
   
   //Load Time and Text lines
   time_t now = time(NULL);
