@@ -4,7 +4,7 @@
         "configurable"
     ],
     "companyName": "Mario Gattringer",
-    "longName": "n3v3rs text one",
+    "longName": "Deutsch",
     "projectType": "native",
     "resources": {
         "media": [
@@ -44,7 +44,7 @@
         ]
     },
     "sdkVersion": "3",
-    "shortName": "n3v3rs text one",
+    "shortName": "Deutsch",
     "uuid": "5a301614-84e4-42cc-b8ba-0e47da96f72b",
     "versionCode": 2,
     "versionLabel": "3.1",
