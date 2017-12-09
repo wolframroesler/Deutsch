@@ -40,6 +40,12 @@ static bool key_indicator_text_nrw	= false;	//true = say "viertel x+1" at xx:45
 static bool key_indicator_text_wien	= false;	//true = say "viertel x+1" at xx:15
 static bool key_indicator_date		= true;		//true = show date
 
+//Display resolution
+enum {
+  XMAX = 144,
+  YMAX = 168
+ };
+
 /*
   ##################################
   ######## Custom Functions ########
@@ -136,7 +142,7 @@ static void load_bluetooth_layers() {
 }
 
 //If a Key is changing, do following:
-static void process_tuple(Tuple *t) {
+static void process_tuple(const Tuple *t) {
   switch(t->key) {
     //Inverter Layer
     case KEY_INVERTED: {
@@ -147,7 +153,7 @@ static void process_tuple(Tuple *t) {
       break;
     }
     case KEY_BLUETOOTH: {
-		  key_indicator_bluetooth = !strcmp(t->value->cstring,"on");
+	  key_indicator_bluetooth = !strcmp(t->value->cstring,"on");
       layer_set_hidden(bitmap_layer_get_layer(bluetooth_layer), !key_indicator_bluetooth);
       if (key_indicator_bluetooth) {
         bluetooth_connection_service_subscribe(bluetooth_connection_callback);
@@ -198,7 +204,7 @@ static void in_received_handler(DictionaryIterator *iter, void *context) {
 //Create Inverter Layer
 #ifdef NOT_YET_MIGRATED_TO_SDKv3
 static void load_inv_layer() {
-  inv_layer = inverter_layer_create((GRect) {.origin = {0, 0}, .size = {144, 168}});
+  inv_layer = inverter_layer_create((GRect) {.origin = {0, 0}, .size = {XMAX, YMAX}});
   layer_add_child(window_get_root_layer(window), inverter_layer_get_layer(inv_layer));
   if (key_indicator_inverted)
     layer_set_hidden(inverter_layer_get_layer(inv_layer), false);
@@ -209,39 +215,39 @@ static void load_inv_layer() {
 
 static void load_text_layers() {
   //Load Fonts
-  GFont bitham = fonts_get_system_font(FONT_KEY_BITHAM_42_LIGHT);
-  GFont bithamBold = fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD);
-  GFont dateFont = fonts_get_system_font(FONT_KEY_GOTHIC_18);
-  ResHandle robotoLight = resource_get_handle(RESOURCE_ID_FONT_ROBOTO_LIGHT_34);
+  GFont bitham 			= fonts_get_system_font(FONT_KEY_BITHAM_42_LIGHT);
+  GFont bithamBold 		= fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD);
+  GFont dateFont		= fonts_get_system_font(FONT_KEY_GOTHIC_18);
+  ResHandle robotoLight	= resource_get_handle(RESOURCE_ID_FONT_ROBOTO_LIGHT_34);
     
   // Configure Minute Layers
-  minuteLayer_3lines = text_layer_create((GRect) { .origin = {0, 10}, .size = {144, 168-10}});
+  minuteLayer_3lines = text_layer_create((GRect) { .origin = {0, 10}, .size = {XMAX, YMAX-10}});
   text_layer_set_text_color(minuteLayer_3lines, GColorWhite);
   text_layer_set_background_color(minuteLayer_3lines, GColorClear);
   text_layer_set_font(minuteLayer_3lines, fonts_load_custom_font(robotoLight));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_3lines));
   
-  minuteLayer_2longlines = text_layer_create((GRect) { .origin = {0, 44}, .size = {144, 168-44}});
+  minuteLayer_2longlines = text_layer_create((GRect) { .origin = {0, 44}, .size = {XMAX, YMAX-44}});
   text_layer_set_text_color(minuteLayer_2longlines, GColorWhite);
   text_layer_set_background_color(minuteLayer_2longlines, GColorClear);
   text_layer_set_font(minuteLayer_2longlines, fonts_load_custom_font(robotoLight));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_2longlines));
   
-  minuteLayer_2biglines = text_layer_create((GRect) {.origin = {0, 23}, .size = {144, 168-23}});
+  minuteLayer_2biglines = text_layer_create((GRect) {.origin = {0, 23}, .size = {XMAX, YMAX-23}});
   text_layer_set_text_color(minuteLayer_2biglines, GColorWhite);
   text_layer_set_background_color(minuteLayer_2biglines, GColorClear);
   text_layer_set_font(minuteLayer_2biglines, bitham);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_2biglines));
   
   // Configure Hour Layer
-  hourLayer = text_layer_create((GRect) { .origin = {0, 109}, .size = {144, 168-109}});
+  hourLayer = text_layer_create((GRect) { .origin = {0, 109}, .size = {XMAX, YMAX-109}});
   text_layer_set_text_color(hourLayer, GColorWhite);
   text_layer_set_background_color(hourLayer, GColorClear);
   text_layer_set_font(hourLayer, bithamBold);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(hourLayer));
   
   // Configure DateLayer
-  dateLayer = text_layer_create((GRect) { .origin = {57, -7}, .size = {144-40, 168}});
+  dateLayer = text_layer_create((GRect) { .origin = {57, -7}, .size = {XMAX-40, YMAX}});
   text_layer_set_text_color(dateLayer, GColorWhite);
   text_layer_set_background_color(dateLayer, GColorClear);
   text_layer_set_font(dateLayer, dateFont);
@@ -250,13 +256,16 @@ static void load_text_layers() {
 }
 
 //Display Time
-static void display_time(struct tm *time) {
+static void display_time(const struct tm *time) {
   //Hour Texts
-  const char *hour_string[25] = { "zwölf", "eins","zwei", "drei", "vier", "fünf", "sechs",
-                                 "sieben", "acht", "neun", "zehn", "elf", "zwölf", "eins", "zwei", "drei", "vier",
-                                 "fünf", "sechs", "sieben", "acht", "neun", "zehn", "elf" , "zwölf"};
+  const char *const hour_string[25] = {
+	"zwölf", "eins","zwei", "drei", "vier", "fünf", "sechs",
+	 "sieben", "acht", "neun", "zehn", "elf", "zwölf", "eins", "zwei", "drei", "vier",
+	 "fünf", "sechs", "sieben", "acht", "neun", "zehn", "elf" , "zwölf"
+   };
+
   //Minute Texts
-  const char *minute_string[] = {
+  const char *const minute_string[] = {
     "\npunkt", "eins\nnach", "zwei\nnach", "drei\nnach", "vier\nnach", "fünf\nnach",
     "sechs\nnach", "sieben\nnach", "acht\nnach", "neun\nnach", "zehn\nnach",
     "elf\nnach", "zwölf\nnach", "dreizehn nach", "vierzehn nach", "viertel nach",
@@ -268,13 +277,14 @@ static void display_time(struct tm *time) {
     "neunzehn vor", "achtzehn vor", "siebzehn vor", "sechzehn vor", "drei-\nviertel",
     "vierzehn vor", "dreizehn vor", "zwölf\nvor", "elf\nvor", "zehn\nvor",
     "neun\nvor", "acht\nvor", "sieben\nvor", "sechs\nvor", "fünf\nvor",
-    "vier\nvor", "drei\nvor", "zwei\nvor", "eins\nvor" };
+    "vier\nvor", "drei\nvor", "zwei\nvor", "eins\nvor"
+  };
   
   // Set Time
-  int hour = time->tm_hour;
-  int min = time->tm_min;
-  int mday = time->tm_mday; //day of the month
-  int month = time->tm_mon +1; //months since January
+  const int hour	= time->tm_hour;
+  const int min		= time->tm_min;
+  const int mday	= time->tm_mday; //day of the month
+  const int month	= time->tm_mon +1; //months since January
 
   char minute_text[50];
   char hour_text[50];
@@ -304,7 +314,7 @@ static void display_time(struct tm *time) {
   }
   
   static char staticTimeText[50] = ""; // Needs to be static because it's used by the system later.
-  strcpy(staticTimeText , "");
+  staticTimeText[0] = '\0';
   strcat(staticTimeText , minute_text);
   
   //Override with Special minute texts
@@ -331,7 +341,7 @@ static void display_time(struct tm *time) {
   }
   
   static char staticHourText[50] = ""; // Needs to be static because it's used by the system later.
-  strcpy(staticHourText , "");
+  staticHourText[0] = '\0';
   strcat(staticHourText , hour_text);
   text_layer_set_text(hourLayer, staticHourText);
   
@@ -366,8 +376,8 @@ static void window_load(Window *window) {
   key_indicator_date =		persist_exists(KEY_DATE) 		? persist_read_bool(KEY_DATE) 		: key_indicator_date;
   
   //Load Time and Text lines
-  time_t now = time(NULL);
-  struct tm *tick_time = localtime(&now);
+  const time_t now = time(NULL);
+  struct tm *const tick_time = localtime(&now);
   load_text_layers();
   display_time(tick_time);
   tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
@@ -419,7 +429,7 @@ static void deinit(void) {
   layer_remove_from_parent(bitmap_layer_get_layer(battery_image_layer));
   bitmap_layer_destroy(battery_image_layer);
     
-  //Save key´s to persistent storage
+  //Save keys to persistent storage
   persist_write_bool(KEY_INVERTED, key_indicator_inverted);
   persist_write_bool(KEY_BLUETOOTH, key_indicator_bluetooth);
   persist_write_bool(KEY_VIBE, key_indicator_vibe);
