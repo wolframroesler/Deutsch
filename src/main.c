@@ -285,11 +285,9 @@ static void display_time(const struct tm *time) {
   const int min		= time->tm_min;
   const int mday	= time->tm_mday; //day of the month
   const int month	= time->tm_mon +1; //months since January
-
-  char minute_text[50];
-  char hour_text[50];
   
   // Minute Text
+  char minute_text[50];
   strcpy(minute_text , minute_string[min]);
   layer_set_hidden(text_layer_get_layer(minuteLayer_3lines), true);
   layer_set_hidden(text_layer_get_layer(minuteLayer_2longlines), true);
@@ -330,6 +328,7 @@ static void display_time(const struct tm *time) {
   text_layer_set_text(minuteLayer_2biglines, staticTimeText);
   
   // Hour Text
+  char hour_text[50];
   if (min < 20) {
     if (min == 15 && key_indicator_text_wien) { //Override with Special minute texts
       strcpy(hour_text , hour_string[hour + 1]);
