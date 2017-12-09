@@ -272,7 +272,7 @@ static void display_time(const struct tm *time) {
     "\npunkt", "eins\nnach", "zwei\nnach", "drei\nnach", "vier\nnach", "fünf\nnach",
     "sechs\nnach", "sieben\nnach", "acht\nnach", "neun\nnach", "zehn\nnach",
     "elf\nnach", "zwölf\nnach", "dreizehn nach", "vierzehn nach", "viertel nach",
-    "sechzehn nach", "siebzehn nach", "achtzehn nach", "neunzehn nach", "zehn\nvor\nhalb",
+    "sechzehn nach", "siebzehn nach", "achtzehn nach", "neunzehn nach", "zwanzig nach",
     "neun\nvor\nhalb", "acht\nvor\nhalb", "sieben\nvor\nhalb", "sechs\nvor\nhalb", "fünf\nvor\nhalb",
     "vier\nvor\nhalb", "drei\nvor\nhalb", "zwei\nvor\nhalb", "eins\nvor\nhalb", "\nhalb",
     "eins\nnach\nhalb", "zwei\nnach\nhalb", "drei\nnach\nhalb", "vier\nnach\nhalb", "fünf\nnach\nhalb",
