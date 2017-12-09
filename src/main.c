@@ -5,7 +5,9 @@
 //Window
 static Window *window;
 //Inverter Layer
+#ifdef NOT_YET_MIGRATED_TO_SDKv3
 static InverterLayer *inv_layer;
+#endif
 //Bluetooth
 static GBitmap *bluetooth_connected_image, *bluetooth_disconnected_image; //Bluetooth images
 static BitmapLayer *bluetooth_layer; //Bluetooth layer
@@ -88,6 +90,7 @@ void battery_layer_update_callback(Layer *me, GContext* ctx) {
 }
 
 static void load_battery_layers() {
+#ifdef NOT_YET_MIGRATED_TO_SDKv3
   battery_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY);
   GRect battery_frame = (GRect) {
     .origin = { .x = 3, .y = 2 },
@@ -104,6 +107,7 @@ static void load_battery_layers() {
     battery_state_service_subscribe(&update_battery);
   }
   update_battery(battery_state_service_peek());
+#endif
 }
 
 //Bluetooth
@@ -123,6 +127,7 @@ void bluetooth_connection_callback(bool connected) {  //Bluetooth handler
 }
 
 static void load_bluetooth_layers() {
+#ifdef NOT_YET_MIGRATED_TO_SDKv3
   bluetooth_connected_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH_CONNECTED);
   bluetooth_disconnected_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH_DISCONNECTED);
   GRect bluetooth_frame = (GRect) {
@@ -138,6 +143,7 @@ static void load_bluetooth_layers() {
   } else {
     layer_set_hidden(bitmap_layer_get_layer(bluetooth_layer), true);
   }
+#endif
 }
 
 //If a Key is changing, do following:
@@ -146,7 +152,9 @@ void process_tuple(Tuple *t) {
     //Inverter Layer
     case KEY_INVERTED: {
       key_indicator_inverted = !strcmp(t->value->cstring,"on"); // easiest way to convert a on/off string into a boolean
+#ifdef NOT_YET_MIGRATED_TO_SDKv3
       layer_set_hidden(inverter_layer_get_layer(inv_layer), !key_indicator_inverted);
+#endif
       break;
     }
     case KEY_BLUETOOTH: {
@@ -199,6 +207,7 @@ void in_received_handler(DictionaryIterator *iter, void *context) {
 }
 
 //Create Inverter Layer
+#ifdef NOT_YET_MIGRATED_TO_SDKv3
 void load_inv_layer() {
   inv_layer = inverter_layer_create((GRect) {.origin = {0, 0}, .size = {144, 168}});
   layer_add_child(window_get_root_layer(window), inverter_layer_get_layer(inv_layer));
@@ -207,6 +216,7 @@ void load_inv_layer() {
   else
     layer_set_hidden(inverter_layer_get_layer(inv_layer), true);
 }
+#endif
 
 static void load_text_layers() {
   //Load Fonts
@@ -388,11 +398,15 @@ static void window_load(Window *window) {
   
   load_battery_layers();
   load_bluetooth_layers();
+#ifdef NOT_YET_MIGRATED_TO_SDKv3
   load_inv_layer();
+#endif
 }
 
 static void window_unload(Window *window) {
+#ifdef NOT_YET_MIGRATED_TO_SDKv3
   inverter_layer_destroy(inv_layer);
+#endif
   text_layer_destroy(minuteLayer_3lines);
   text_layer_destroy(minuteLayer_2longlines);
   text_layer_destroy(minuteLayer_2biglines);
