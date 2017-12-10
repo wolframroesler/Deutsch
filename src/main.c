@@ -44,6 +44,7 @@ static bool key_indicator_date		= true;		//true = show date
 static const bool key_indicator_fuzzy = true;			// true = don't be too exact about the time
 static const bool key_indicator_batt_redonly = true;	// true = show battery icon only if red
 static const bool key_indicator_bt_offonly = true;		// true = show Bluetooth icon only if offline
+static const bool key_indicator_rightalign = true;		// true = right aligned text, false=left aligned
 
 //Display resolution
 enum {
@@ -239,21 +240,27 @@ static void load_text_layers() {
   GFont bithamBold 		= fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD);
   GFont dateFont		= fonts_get_system_font(FONT_KEY_GOTHIC_18);
   ResHandle robotoLight	= resource_get_handle(RESOURCE_ID_FONT_ROBOTO_LIGHT_34);
+
+  //Get alignment
+  const GTextAlignment align = key_indicator_rightalign ? GTextAlignmentRight : GTextAlignmentLeft;
     
   // Configure Minute Layers
   minuteLayer_3lines = text_layer_create((GRect) { .origin = {0, 10}, .size = {XMAX, YMAX-10}});
+  text_layer_set_text_alignment(minuteLayer_3lines, align);
   text_layer_set_text_color(minuteLayer_3lines, GColorWhite);
   text_layer_set_background_color(minuteLayer_3lines, GColorClear);
   text_layer_set_font(minuteLayer_3lines, fonts_load_custom_font(robotoLight));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_3lines));
   
   minuteLayer_2longlines = text_layer_create((GRect) { .origin = {0, 44}, .size = {XMAX, YMAX-44}});
+  text_layer_set_text_alignment(minuteLayer_2longlines, align);
   text_layer_set_text_color(minuteLayer_2longlines, GColorWhite);
   text_layer_set_background_color(minuteLayer_2longlines, GColorClear);
   text_layer_set_font(minuteLayer_2longlines, fonts_load_custom_font(robotoLight));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_2longlines));
   
   minuteLayer_2biglines = text_layer_create((GRect) {.origin = {0, 23}, .size = {XMAX, YMAX-23}});
+  text_layer_set_text_alignment(minuteLayer_2biglines, align);
   text_layer_set_text_color(minuteLayer_2biglines, GColorWhite);
   text_layer_set_background_color(minuteLayer_2biglines, GColorClear);
   text_layer_set_font(minuteLayer_2biglines, bitham);
@@ -261,6 +268,7 @@ static void load_text_layers() {
   
   // Configure Hour Layer
   hourLayer = text_layer_create((GRect) { .origin = {0, 109}, .size = {XMAX, YMAX-109}});
+  text_layer_set_text_alignment(hourLayer, align);
   text_layer_set_text_color(hourLayer, GColorWhite);
   text_layer_set_background_color(hourLayer, GColorClear);
   text_layer_set_font(hourLayer, bithamBold);
