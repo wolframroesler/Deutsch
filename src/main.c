@@ -98,7 +98,7 @@ static void battery_layer_update_callback(Layer *me, GContext* ctx) {
   const GColor color = batteryPercent <= red_percent ? GColorRed : GColorWhite;
   graphics_context_set_stroke_color(ctx, color);
   graphics_context_set_fill_color(ctx, color);
-  graphics_fill_rect(ctx, GRect(2, 2, ((batteryPercent/100.0)*11.0), 5), 0, GCornerNone);
+  graphics_fill_rect(ctx, GRect(2, 2, batteryPercent/100.0*11.0, 5), 0, GCornerNone);
 }
 
 static void load_battery_layers() {
@@ -282,7 +282,7 @@ static void display_time(const struct tm *time) {
     "\npunkt", "eins\nnach", "zwei\nnach", "drei\nnach", "vier\nnach", "fünf\nnach",
     "sechs\nnach", "sieben\nnach", "acht\nnach", "neun\nnach", "zehn\nnach",
     "elf\nnach", "zwölf\nnach", "dreizehn nach", "vierzehn nach", "viertel nach",
-    "sechzehn nach", "siebzehn nach", "achtzehn nach", "neunzehn nach", "zwanzig nach",
+    "sechzehn nach", "siebzehn nach", "achtzehn nach", "neunzehn nach", "\nzwanzig nach",
     "neun\nvor\nhalb", "acht\nvor\nhalb", "sieben\nvor\nhalb", "sechs\nvor\nhalb", "fünf\nvor\nhalb",
     "vier\nvor\nhalb", "drei\nvor\nhalb", "zwei\nvor\nhalb", "eins\nvor\nhalb", "\nhalb",
     "eins\nnach\nhalb", "zwei\nnach\nhalb", "drei\nnach\nhalb", "vier\nnach\nhalb", "fünf\nnach\nhalb",
@@ -290,7 +290,7 @@ static void display_time(const struct tm *time) {
     "neunzehn vor", "achtzehn vor", "siebzehn vor", "sechzehn vor", "drei-\nviertel",
     "vierzehn vor", "dreizehn vor", "zwölf\nvor", "elf\nvor", "zehn\nvor",
     "neun\nvor", "acht\nvor", "sieben\nvor", "sechs\nvor", "fünf\nvor",
-    "vier\nvor", "drei\nvor", "zwei\nvor", "eins\nvor"
+    "vier\nvor", "drei\nvor", "zwei\nvor", "eins\nvor", "kurz vor"
   };
   
   // Set Time
@@ -359,7 +359,7 @@ static void display_time(const struct tm *time) {
   
   // Hour Text
   char hour_text[50];
-  if (min < 20) {
+  if (min <= 20) {
     if (min == 15 && key_indicator_text_wien) { //Override with Special minute texts
       strcpy(hour_text , hour_string[hour + 1]);
     } else {
