@@ -43,6 +43,7 @@ static bool key_indicator_date		= true;		//true = show date
 // The following are not yet configurable, but let's pretend they are:
 static const bool key_indicator_fuzzy = true;			// true = don't be too exact about the time
 static const bool key_indicator_batt_redonly = true;	// true = show battery icon only if red
+static const bool key_indicator_bt_offonly = true;		// true = show Bluetooth icon only if offline
 
 //Display resolution
 enum {
@@ -123,9 +124,15 @@ static void load_battery_layers() {
 //Bluetooth
 static void toggle_bluetooth_icon(bool connected) { // Toggle bluetooth
   if (connected) {
-    bitmap_layer_set_bitmap(bluetooth_layer, bluetooth_connected_image);
+	if (key_indicator_bt_offonly) {
+	  layer_set_hidden(bitmap_layer_get_layer(bluetooth_layer), true);
+	} else {
+      bitmap_layer_set_bitmap(bluetooth_layer, bluetooth_connected_image);
+      layer_set_hidden(bitmap_layer_get_layer(bluetooth_layer), false);
+	}
   } else {
     bitmap_layer_set_bitmap(bluetooth_layer, bluetooth_disconnected_image);
+	layer_set_hidden(bitmap_layer_get_layer(bluetooth_layer), false);
   }
   if (!connected && key_indicator_vibe) {
     vibes_long_pulse();
