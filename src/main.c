@@ -286,10 +286,8 @@ static void load_text_layers() {
 //Display Time
 static void display_time(const struct tm *time) {
   //Hour Texts
-  const char *const hour_string[25] = {
-	"zwölf", "eins","zwei", "drei", "vier", "fünf", "sechs",
-	 "sieben", "acht", "neun", "zehn", "elf", "zwölf", "eins", "zwei", "drei", "vier",
-	 "fünf", "sechs", "sieben", "acht", "neun", "zehn", "elf" , "zwölf"
+  const char *const hour_string[] = {
+	"zwölf", "eins","zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun", "zehn", "elf"
    };
 
   //Minute Texts
@@ -307,12 +305,17 @@ static void display_time(const struct tm *time) {
     "neun\nvor", "acht\nvor", "sieben\nvor", "sechs\nvor", "fünf\nvor",
     "vier\nvor", "drei\nvor", "zwei\nvor", "eins\nvor", "kurz vor"
   };
+
+  //Day of week texts
+  const char *const day_string[] = {
+    "so", "mo", "di", "mi", "do", "fr", "sa"
+  };
   
   // Set Time
   const int hour	= time->tm_hour;
   int       min		= time->tm_min;
   const int mday	= time->tm_mday; //day of the month
-  const int month	= time->tm_mon +1; //months since January
+  const int wday	= time->tm_wday; //day of week (0=sunday, 1=monday, etc.)
 
   //Fuzzy mode, e. g. say "fünf nach drei" when it's actually already 15:07.
   if (key_indicator_fuzzy) {
@@ -376,12 +379,12 @@ static void display_time(const struct tm *time) {
   char hour_text[50];
   if (min <= 20) {
     if (min == 15 && key_indicator_text_wien) { //Override with Special minute texts
-      strcpy(hour_text , hour_string[hour + 1]);
+      strcpy(hour_text , hour_string[(hour + 1) % 12]);
     } else {
-      strcpy(hour_text , hour_string[hour]);
+      strcpy(hour_text , hour_string[hour % 12]);
     }
   } else {
-  	strcpy(hour_text , hour_string[hour + 1]);
+    strcpy(hour_text , hour_string[(hour + 1) % 12]);
   }
   
   static char staticHourText[50] = ""; // Needs to be static because it's used by the system later.
@@ -391,7 +394,7 @@ static void display_time(const struct tm *time) {
   
   // Weekday
   static char staticDateText[16];
-  snprintf(staticDateText, sizeof(staticDateText), "%i.%i.", mday, month);
+  snprintf(staticDateText, sizeof(staticDateText), "%s %i", day_string[wday], mday);
   text_layer_set_text(dateLayer, staticDateText);
 }
 
