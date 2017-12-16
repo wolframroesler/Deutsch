@@ -13,7 +13,7 @@ A battery icon is displayed in the upper left corner when charge drops to 10 % o
 
 ![Battery and Bluetooth icons](icons.png)
 
-The watchface is based on https://github.com/n3v3r001/n3v3rstextone, with the overall design and most of the source code unchanged. Both use the same settings dialog and share settings when installing one over the other on the watch. I applied the following changes:
+The watchface is based on https://github.com/n3v3r001/n3v3rstextone, with the overall design and most of the source code unchanged. Both use the same settings dialog and share settings when installing one over the other on the watch. I applied the following changes (refer to the git log for details):
 
 * Add fuzzy mode (the original would give the exact time, e. g. "sieben nach halb elf")
 * Align text to the right (since I wear the watch on the left wrist, and the left side of the watch is frequently covered by the shirt sleeve)
