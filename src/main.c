@@ -46,6 +46,21 @@ static const bool key_indicator_batt_redonly = true;	// true = show battery icon
 static const bool key_indicator_bt_offonly = true;		// true = show Bluetooth icon only if offline
 static const bool key_indicator_rightalign = true;		// true = right aligned text, false=left aligned
 
+// Colors
+#if 0
+    // Classic
+    #define COLOR_BKGND     GColorBlack
+    #define COLOR_DATE      GColorWhite
+    #define COLOR_MINUTE    GColorWhite
+    #define COLOR_HOUR      GColorWhite
+#else
+    // Colorful
+    #define COLOR_BKGND     GColorOxfordBlue
+    #define COLOR_DATE      GColorWhite
+    #define COLOR_MINUTE    GColorCeleste
+    #define COLOR_HOUR      GColorPastelYellow
+#endif
+
 //Display resolution
 enum {
   XMAX = 144,
@@ -247,21 +262,21 @@ static void load_text_layers() {
   // Configure Minute Layers
   minuteLayer_3lines = text_layer_create((GRect) { .origin = {0, 10}, .size = {XMAX, YMAX-10}});
   text_layer_set_text_alignment(minuteLayer_3lines, align);
-  text_layer_set_text_color(minuteLayer_3lines, GColorWhite);
+  text_layer_set_text_color(minuteLayer_3lines, COLOR_MINUTE);
   text_layer_set_background_color(minuteLayer_3lines, GColorClear);
   text_layer_set_font(minuteLayer_3lines, fonts_load_custom_font(robotoLight));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_3lines));
   
   minuteLayer_2longlines = text_layer_create((GRect) { .origin = {0, 44}, .size = {XMAX, YMAX-44}});
   text_layer_set_text_alignment(minuteLayer_2longlines, align);
-  text_layer_set_text_color(minuteLayer_2longlines, GColorWhite);
+  text_layer_set_text_color(minuteLayer_2longlines, COLOR_MINUTE);
   text_layer_set_background_color(minuteLayer_2longlines, GColorClear);
   text_layer_set_font(minuteLayer_2longlines, fonts_load_custom_font(robotoLight));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_2longlines));
   
   minuteLayer_2biglines = text_layer_create((GRect) {.origin = {0, 23}, .size = {XMAX, YMAX-23}});
   text_layer_set_text_alignment(minuteLayer_2biglines, align);
-  text_layer_set_text_color(minuteLayer_2biglines, GColorWhite);
+  text_layer_set_text_color(minuteLayer_2biglines, COLOR_MINUTE);
   text_layer_set_background_color(minuteLayer_2biglines, GColorClear);
   text_layer_set_font(minuteLayer_2biglines, bitham);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_2biglines));
@@ -269,14 +284,14 @@ static void load_text_layers() {
   // Configure Hour Layer
   hourLayer = text_layer_create((GRect) { .origin = {0, 109}, .size = {XMAX, YMAX-109}});
   text_layer_set_text_alignment(hourLayer, align);
-  text_layer_set_text_color(hourLayer, GColorWhite);
+  text_layer_set_text_color(hourLayer, COLOR_HOUR);
   text_layer_set_background_color(hourLayer, GColorClear);
   text_layer_set_font(hourLayer, bithamBold);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(hourLayer));
   
   // Configure DateLayer
   dateLayer = text_layer_create((GRect) { .origin = {57, -7}, .size = {XMAX-40, YMAX}});
-  text_layer_set_text_color(dateLayer, GColorWhite);
+  text_layer_set_text_color(dateLayer, COLOR_DATE);
   text_layer_set_background_color(dateLayer, GColorClear);
   text_layer_set_font(dateLayer, dateFont);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(dateLayer));
@@ -449,7 +464,7 @@ static void window_unload(Window *window) {
 
 static void init(void) {
   window = window_create();
-  window_set_background_color(window, GColorBlack);
+  window_set_background_color(window, COLOR_BKGND);
   window_set_window_handlers(window, (WindowHandlers) {
     .load = window_load,
     .unload = window_unload,
