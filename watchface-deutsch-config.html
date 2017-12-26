@@ -17,6 +17,15 @@
 
 		<div data-role="content">
 
+			<div class="ui-body ui-body-b">
+				<fieldset class="ui-grid-a">
+					<div class="ui-block-a"><button type="submit" data-theme="d" id="b-cancel">Cancel</button></div>
+					<div class="ui-block-b"><button type="submit" data-theme="a" id="b-submit">Submit</button></div>
+				</fieldset>
+			</div>
+
+			<hr>
+
             <div data-role="fieldcontain">
                 <label for="KEY_THEME">Farbschema</label>
                 <select name="KEY_THEME" id="KEY_THEME">
@@ -34,6 +43,24 @@
                 </select>
 			</div>
 			
+			<div data-role="fieldcontain">
+				<label for="KEY_TEXT_WIEN">"Viertel Elf" f&uuml;r 10:15</label>
+				<select name="KEY_TEXT_WIEN" id="KEY_TEXT_WIEN" data-role="slider">
+					<option value="off">Nein</option>
+					<option value="on">Ja</option>
+				</select>
+			</div>
+
+			<div data-role="fieldcontain">
+				<label for="KEY_TEXT_NRW">"Viertel vor Elf" f&uuml;r 10:45</label>
+				<select name="KEY_TEXT_NRW" id="KEY_TEXT_NRW" data-role="slider">
+					<option value="off">Nein</option>
+					<option value="on">Ja</option>
+				</select>
+			</div>
+
+			<hr>
+
 			<div data-role="fieldcontain">
 				<label for="KEY_DATE">Datum anzeigen</label>
 				<select name="KEY_DATE" id="KEY_DATE" data-role="slider">
@@ -78,30 +105,6 @@
 				</select>
 			</div>
 
-			<hr>
-			
-			<div data-role="fieldcontain">
-				<label for="KEY_TEXT_WIEN">"Viertel Elf" f&uuml;r 10:15</label>
-				<select name="KEY_TEXT_WIEN" id="KEY_TEXT_WIEN" data-role="slider">
-					<option value="off">Nein</option>
-					<option value="on">Ja</option>
-				</select>
-			</div>
-
-			<div data-role="fieldcontain">
-				<label for="KEY_TEXT_NRW">"Viertel vor Elf" f&uuml;r 10:45</label>
-				<select name="KEY_TEXT_NRW" id="KEY_TEXT_NRW" data-role="slider">
-					<option value="off">Nein</option>
-					<option value="on">Ja</option>
-				</select>
-			</div>		
-		
-			<div class="ui-body ui-body-b">
-				<fieldset class="ui-grid-a">
-					<div class="ui-block-a"><button type="submit" data-theme="d" id="b-cancel">Cancel</button></div>
-					<div class="ui-block-b"><button type="submit" data-theme="a" id="b-submit">Submit</button></div>
-				</fieldset>
-			</div>
 		</div>
 	</div>
 
