@@ -63,6 +63,7 @@ static GColor color_bkgnd() {
         default:    return GColorBlack;         // B/W
         case 1:     return GColorOxfordBlue;    // Blue
         case 2:     return GColorBulgarianRose; // Red
+        case 3:     return GColorBlack;         // Gray
     }
 }
 
@@ -71,6 +72,7 @@ static GColor color_date() {
         default:    return GColorWhite;         // B/W
         case 1:     return GColorWhite;         // Blue
         case 2:     return GColorWhite;         // Red
+        case 3:     return GColorWhite;         // Gray
     }
 }
 
@@ -79,6 +81,7 @@ static GColor color_minute() {
         default:    return GColorWhite;         // B/W
         case 1:     return GColorCeleste;       // Blue
         case 2:     return GColorMelon;         // Red
+        case 3:     return GColorInchworm;      // Gray
     }
 }
 
@@ -87,6 +90,7 @@ static GColor color_hour() {
         default:    return GColorWhite;         // B/W
         case 1:     return GColorPastelYellow;  // Blue
         case 2:     return GColorPastelYellow;  // Red
+        case 3:     return GColorPastelYellow;  // Gray
     }
 }
 
