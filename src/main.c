@@ -17,13 +17,14 @@ static TextLayer *minuteLayer_2longlines, *minuteLayer_3lines, *minuteLayer_2big
 
 //Set key IDs
 enum {
-  KEY_FUZZY = 0,
+  KEY_FUZZY     = 0,
   KEY_BLUETOOTH = 1,
-  KEY_VIBE = 2,
-  KEY_BATT_IMG = 3,
-  KEY_TEXT_NRW = 4,
+  KEY_VIBE      = 2,
+  KEY_BATT_IMG  = 3,
+  KEY_TEXT_NRW  = 4,
   KEY_TEXT_WIEN = 5,
-  KEY_DATE = 6
+  KEY_DATE      = 6,
+  KEY_THEME     = 7,
 };
 
 //Default key values
@@ -34,26 +35,12 @@ static bool key_indicator_batt_img	= true;		//true = show batt usage image
 static bool key_indicator_text_nrw	= false;	//true = say "viertel x+1" at xx:45
 static bool key_indicator_text_wien	= false;	//true = say "viertel x+1" at xx:15
 static bool key_indicator_date		= true;		//true = show date
+static int  key_indicator_theme     = 0;        //Color Theme
 
 // The following are not yet configurable, but let's pretend they are:
 static const bool key_indicator_batt_redonly = true;	// true = show battery icon only if red
 static const bool key_indicator_bt_offonly = true;		// true = show Bluetooth icon only if offline
 static const bool key_indicator_rightalign = true;		// true = right aligned text, false=left aligned
-
-// Colors
-#if 0
-    // Classic
-    #define COLOR_BKGND     GColorBlack
-    #define COLOR_DATE      GColorWhite
-    #define COLOR_MINUTE    GColorWhite
-    #define COLOR_HOUR      GColorWhite
-#else
-    // Colorful
-    #define COLOR_BKGND     GColorOxfordBlue
-    #define COLOR_DATE      GColorWhite
-    #define COLOR_MINUTE    GColorCeleste
-    #define COLOR_HOUR      GColorPastelYellow
-#endif
 
 //Display resolution
 enum {
@@ -70,6 +57,34 @@ static const int red_percent = 10;
   ######## Custom Functions ########
   ##################################
 */
+
+static GColor color_bkgnd() {
+    switch(key_indicator_theme) {
+        default:    return GColorBlack;         // B/W
+        case 1:     return GColorOxfordBlue;    // Blue
+    }
+}
+
+static GColor color_date() {
+    switch(key_indicator_theme) {
+        default:    return GColorWhite;         // B/W
+        case 1:     return GColorWhite;         // Blue
+    }
+}
+
+static GColor color_minute() {
+    switch(key_indicator_theme) {
+        default:    return GColorWhite;         // B/W
+        case 1:     return GColorCeleste;       // Blue
+    }
+}
+
+static GColor color_hour() {
+    switch(key_indicator_theme) {
+        default:    return GColorWhite;         // B/W
+        case 1:     return GColorPastelYellow;  // Blue
+    }
+}
 
 //Battery - set image if charging, or set empty battery image if not charging
 static void change_battery_icon(bool charging) {
@@ -219,6 +234,10 @@ static void process_tuple(const Tuple *t) {
       layer_set_hidden(text_layer_get_layer(dateLayer), !key_indicator_date);
       break;
     }
+    case KEY_THEME: {
+      key_indicator_theme = atoi(t->value->cstring);
+      break;
+    }
   }
 }
 
@@ -241,21 +260,21 @@ static void load_text_layers() {
   // Configure Minute Layers
   minuteLayer_3lines = text_layer_create((GRect) { .origin = {0, 10}, .size = {XMAX, YMAX-10}});
   text_layer_set_text_alignment(minuteLayer_3lines, align);
-  text_layer_set_text_color(minuteLayer_3lines, COLOR_MINUTE);
+  text_layer_set_text_color(minuteLayer_3lines, color_minute());
   text_layer_set_background_color(minuteLayer_3lines, GColorClear);
   text_layer_set_font(minuteLayer_3lines, fonts_load_custom_font(robotoLight));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_3lines));
   
   minuteLayer_2longlines = text_layer_create((GRect) { .origin = {0, 44}, .size = {XMAX, YMAX-44}});
   text_layer_set_text_alignment(minuteLayer_2longlines, align);
-  text_layer_set_text_color(minuteLayer_2longlines, COLOR_MINUTE);
+  text_layer_set_text_color(minuteLayer_2longlines, color_minute());
   text_layer_set_background_color(minuteLayer_2longlines, GColorClear);
   text_layer_set_font(minuteLayer_2longlines, fonts_load_custom_font(robotoLight));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_2longlines));
   
   minuteLayer_2biglines = text_layer_create((GRect) {.origin = {0, 23}, .size = {XMAX, YMAX-23}});
   text_layer_set_text_alignment(minuteLayer_2biglines, align);
-  text_layer_set_text_color(minuteLayer_2biglines, COLOR_MINUTE);
+  text_layer_set_text_color(minuteLayer_2biglines, color_minute());
   text_layer_set_background_color(minuteLayer_2biglines, GColorClear);
   text_layer_set_font(minuteLayer_2biglines, bitham);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_2biglines));
@@ -263,14 +282,14 @@ static void load_text_layers() {
   // Configure Hour Layer
   hourLayer = text_layer_create((GRect) { .origin = {0, 109}, .size = {XMAX, YMAX-109}});
   text_layer_set_text_alignment(hourLayer, align);
-  text_layer_set_text_color(hourLayer, COLOR_HOUR);
+  text_layer_set_text_color(hourLayer, color_hour());
   text_layer_set_background_color(hourLayer, GColorClear);
   text_layer_set_font(hourLayer, bithamBold);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(hourLayer));
   
   // Configure DateLayer
   dateLayer = text_layer_create((GRect) { .origin = {57, -7}, .size = {XMAX-40, YMAX}});
-  text_layer_set_text_color(dateLayer, COLOR_DATE);
+  text_layer_set_text_color(dateLayer, color_date());
   text_layer_set_background_color(dateLayer, GColorClear);
   text_layer_set_font(dateLayer, dateFont);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(dateLayer));
@@ -405,6 +424,7 @@ static void window_load(Window *window) {
   key_indicator_text_nrw =	persist_exists(KEY_TEXT_NRW) 	? persist_read_bool(KEY_TEXT_NRW) 	: key_indicator_text_nrw;
   key_indicator_text_wien =	persist_exists(KEY_TEXT_WIEN) 	? persist_read_bool(KEY_TEXT_WIEN)	: key_indicator_text_wien;
   key_indicator_date =		persist_exists(KEY_DATE) 		? persist_read_bool(KEY_DATE) 		: key_indicator_date;
+  key_indicator_theme =	    persist_exists(KEY_THEME) 		? persist_read_bool(KEY_THEME) 		: key_indicator_theme;
   
   //Load Time and Text lines
   const time_t now = time(NULL);
@@ -427,7 +447,7 @@ static void window_unload(Window *window) {
 
 static void init(void) {
   window = window_create();
-  window_set_background_color(window, COLOR_BKGND);
+  window_set_background_color(window, color_bkgnd());
   window_set_window_handlers(window, (WindowHandlers) {
     .load = window_load,
     .unload = window_unload,
@@ -462,6 +482,7 @@ static void deinit(void) {
   persist_write_bool(KEY_TEXT_NRW,  key_indicator_text_nrw);
   persist_write_bool(KEY_TEXT_WIEN, key_indicator_text_wien);
   persist_write_bool(KEY_DATE,      key_indicator_date);
+  persist_write_int (KEY_THEME,     key_indicator_theme);
 }
 
 int main(void) {
