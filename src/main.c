@@ -280,12 +280,12 @@ static void load_text_layers() {
 //Display Time
 static void display_time(const struct tm *time) {
   //Hour Texts
-  const char *const hour_string[] = {
+  static const char *const hour_string[] = {
 	"zwölf", "eins","zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun", "zehn", "elf"
    };
 
   //Minute Texts
-  const char *const minute_string[] = {
+  static const char *const minute_string[] = {
     "\npunkt", "eins\nnach", "zwei\nnach", "drei\nnach", "vier\nnach", "fünf\nnach",
     "sechs\nnach", "sieben\nnach", "acht\nnach", "neun\nnach", "zehn\nnach",
     "elf\nnach", "zwölf\nnach", "dreizehn nach", "vierzehn nach", "viertel nach",
@@ -301,7 +301,7 @@ static void display_time(const struct tm *time) {
   };
 
   //Day of week texts
-  const char *const day_string[] = {
+  static const char *const day_string[] = {
     "so", "mo", "di", "mi", "do", "fr", "sa"
   };
   
@@ -314,23 +314,16 @@ static void display_time(const struct tm *time) {
   //Fuzzy mode, e. g. say "fünf nach drei" when it's actually already 15:07.
   if (key_indicator_fuzzy) {
 	static const int delta[] = {
-		0,		// 0
-		-1,		// 1
-		-2,		// 2
-		2,		// 3
-		1,		// 4
-		0,		// 5
-		-1,		// 6
-		-2,		// 7
-		2,		// 8
-		1		// 9
+		0,		// 0    5
+		-1,		// 1    6
+		-2,		// 2    7
+		2,		// 3    8
+		1,		// 4    9
 	};
-	min += delta[min%10];
+	min += delta[min%5];
   }
   
-  // Minute Text
-  char minute_text[50];
-  strcpy(minute_text , minute_string[min]);
+  // Configure the minute layers
   layer_set_hidden(text_layer_get_layer(minuteLayer_3lines), true);
   layer_set_hidden(text_layer_get_layer(minuteLayer_2longlines), true);
   layer_set_hidden(text_layer_get_layer(minuteLayer_2biglines), true);  
@@ -353,9 +346,9 @@ static void display_time(const struct tm *time) {
       layer_set_hidden(text_layer_get_layer(minuteLayer_2biglines), false);
   }
   
-  static char staticTimeText[50] = ""; // Needs to be static because it's used by the system later.
+  static char staticTimeText[20+1] = ""; // Needs to be static because it's used by the system later.
   staticTimeText[0] = '\0';
-  strcat(staticTimeText , minute_text);
+  strcat(staticTimeText , minute_string[min]);
   
   //Override with Special minute texts
   if (key_indicator_text_nrw && min == 45) {
@@ -370,24 +363,21 @@ static void display_time(const struct tm *time) {
   text_layer_set_text(minuteLayer_2biglines, staticTimeText);
   
   // Hour Text
-  char hour_text[50];
+  static char staticHourText[10+1] = ""; // Needs to be static because it's used by the system later.
   if (min <= 20) {
     if (min == 15 && key_indicator_text_wien) { //Override with Special minute texts
-      strcpy(hour_text , hour_string[(hour + 1) % 12]);
+      strcpy(staticHourText, hour_string[(hour + 1) % 12]);
     } else {
-      strcpy(hour_text , hour_string[hour % 12]);
+      strcpy(staticHourText , hour_string[hour % 12]);
     }
   } else {
-    strcpy(hour_text , hour_string[(hour + 1) % 12]);
+    strcpy(staticHourText , hour_string[(hour + 1) % 12]);
   }
   
-  static char staticHourText[50] = ""; // Needs to be static because it's used by the system later.
-  staticHourText[0] = '\0';
-  strcat(staticHourText , hour_text);
   text_layer_set_text(hourLayer, staticHourText);
   
   // Weekday
-  static char staticDateText[16];
+  static char staticDateText[5+1];
   snprintf(staticDateText, sizeof(staticDateText), "%s %i", day_string[wday], mday);
   text_layer_set_text(dateLayer, staticDateText);
 }
