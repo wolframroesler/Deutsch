@@ -18,7 +18,7 @@
 		<div data-role="content">
 
             <div data-role="fieldcontain">
-                <label for="KEY_THEME">Farbschema:</label>
+                <label for="KEY_THEME">Farbschema</label>
                 <select name="KEY_THEME" id="KEY_THEME">
                     <option value="0">Schwarz/wei&szlig;</option>
                     <option value="1">Blau</option>
@@ -134,7 +134,12 @@
 				var field = $("#"+key);
 				if (field !== null) {
 					var value = decodeURIComponent(params[key]);
-					field.val(value).slider("refresh");
+                    if (key=='KEY_THEME') {
+                        $("#"+key).val(value);
+                        $("#"+key).selectmenu("refresh");
+                    } else {
+                        field.val(value).slider("refresh");
+                    }
 				}
 			}
 		}
@@ -152,7 +157,6 @@
 
 				var location = "pebblejs://close#" + encodeURIComponent(JSON.stringify(saveOptions()));
 				console.log("Warping to: " + location);
-				console.log(location);
 				document.location = location;
 			});
 		});
