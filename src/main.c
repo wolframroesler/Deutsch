@@ -62,6 +62,7 @@ static GColor color_bkgnd() {
     switch(key_indicator_theme) {
         default:    return GColorBlack;         // B/W
         case 1:     return GColorOxfordBlue;    // Blue
+        case 2:     return GColorBulgarianRose; // Red
     }
 }
 
@@ -69,6 +70,7 @@ static GColor color_date() {
     switch(key_indicator_theme) {
         default:    return GColorWhite;         // B/W
         case 1:     return GColorWhite;         // Blue
+        case 2:     return GColorWhite;         // Red
     }
 }
 
@@ -76,6 +78,7 @@ static GColor color_minute() {
     switch(key_indicator_theme) {
         default:    return GColorWhite;         // B/W
         case 1:     return GColorCeleste;       // Blue
+        case 2:     return GColorMelon;         // Red
     }
 }
 
@@ -83,6 +86,7 @@ static GColor color_hour() {
     switch(key_indicator_theme) {
         default:    return GColorWhite;         // B/W
         case 1:     return GColorPastelYellow;  // Blue
+        case 2:     return GColorPastelYellow;  // Red
     }
 }
 
@@ -188,6 +192,8 @@ static void load_bluetooth_layers() {
 
 //If a Key is changing, do following:
 static void process_tuple(const Tuple *t) {
+  APP_LOG(APP_LOG_LEVEL_INFO,"[Deutsch] Received setting: key %lu is %s",t->key,t->value->cstring);
+
   switch(t->key) {
     //Fuzzy mode
     case KEY_FUZZY: {
@@ -244,7 +250,7 @@ static void process_tuple(const Tuple *t) {
 //If a Key is changing, call process_tuple
 static void in_received_handler(DictionaryIterator *iter, void *context) {
 	for(Tuple *t=dict_read_first(iter); t!=NULL; t=dict_read_next(iter))
-    process_tuple(t);
+        process_tuple(t);
 }
 
 static void load_text_layers() {
@@ -414,7 +420,7 @@ static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 static void window_load(Window *window) {
   //Key
   app_message_register_inbox_received(in_received_handler); //register key receiving
-	app_message_open(512, 512); //Key buffer in- and outbound
+  app_message_open(512, 512); //Key buffer in- and outbound
   
   //Load value from storage, if storage is empty load default value
   key_indicator_fuzzy =	    persist_exists(KEY_FUZZY) 	    ? persist_read_bool(KEY_FUZZY) 	    : key_indicator_fuzzy;
