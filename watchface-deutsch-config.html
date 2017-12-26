@@ -17,15 +17,13 @@
 
 		<div data-role="content">
 
-			<!--
 			<div data-role="fieldcontain">
-			<label for="KEY_INVERTED">Invert (black on white)</label>
-			<select name="KEY_INVERTED" id="KEY_INVERTED" data-role="slider">
+			<label for="KEY_FUZZY">Fuzzy-Modus (Uhrzeit umgangssprachlich)</label>
+			<select name="KEY_FUZZY" id="KEY_FUZZY" data-role="slider">
 			<option value="off">Nein</option>
 			<option value="on">Ja</option>
 			</select>
 			</div>
-			-->
 			
 			<div data-role="fieldcontain">
 				<label for="KEY_DATE">Datum anzeigen</label>
@@ -101,7 +99,7 @@
 	<script>
 		function saveOptions() {
 			var options = {
-				'KEY_INVERTED': $("#KEY_INVERTED").val(),
+				'KEY_FUZZY': $("#KEY_FUZZY").val(),
 				'KEY_BLUETOOTH': $("#KEY_BLUETOOTH").val(),
 				'KEY_VIBE': $("#KEY_VIBE").val(),
 				'KEY_BATT_IMG': $("#KEY_BATT_IMG").val(),

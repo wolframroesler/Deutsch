@@ -17,7 +17,7 @@ static TextLayer *minuteLayer_2longlines, *minuteLayer_3lines, *minuteLayer_2big
 
 //Set key IDs
 enum {
-  KEY_INVERTED = 0,
+  KEY_FUZZY = 0,
   KEY_BLUETOOTH = 1,
   KEY_VIBE = 2,
   KEY_BATT_IMG = 3,
@@ -27,7 +27,7 @@ enum {
 };
 
 //Default key values
-static bool key_indicator_inverted	= false;	//true = white background
+static bool key_indicator_fuzzy 	= true;	    //true = don't be too exact about the time
 static bool key_indicator_bluetooth	= true;		//true = bluetooth icon on
 static bool key_indicator_vibe 		= true;		//true = vibe on bluetooth disconnect
 static bool key_indicator_batt_img	= true;		//true = show batt usage image
@@ -36,7 +36,6 @@ static bool key_indicator_text_wien	= false;	//true = say "viertel x+1" at xx:15
 static bool key_indicator_date		= true;		//true = show date
 
 // The following are not yet configurable, but let's pretend they are:
-static const bool key_indicator_fuzzy = true;			// true = don't be too exact about the time
 static const bool key_indicator_batt_redonly = true;	// true = show battery icon only if red
 static const bool key_indicator_bt_offonly = true;		// true = show Bluetooth icon only if offline
 static const bool key_indicator_rightalign = true;		// true = right aligned text, false=left aligned
@@ -175,9 +174,9 @@ static void load_bluetooth_layers() {
 //If a Key is changing, do following:
 static void process_tuple(const Tuple *t) {
   switch(t->key) {
-    //Inverter Layer
-    case KEY_INVERTED: {
-      key_indicator_inverted = !strcmp(t->value->cstring,"on"); // easiest way to convert a on/off string into a boolean
+    //Fuzzy mode
+    case KEY_FUZZY: {
+      key_indicator_fuzzy = !strcmp(t->value->cstring,"on"); // easiest way to convert a on/off string into a boolean
       break;
     }
     case KEY_BLUETOOTH: {
@@ -409,7 +408,7 @@ static void window_load(Window *window) {
 	app_message_open(512, 512); //Key buffer in- and outbound
   
   //Load value from storage, if storage is empty load default value
-  key_indicator_inverted =	persist_exists(KEY_INVERTED) 	? persist_read_bool(KEY_INVERTED) 	: key_indicator_inverted;
+  key_indicator_fuzzy =	    persist_exists(KEY_FUZZY) 	    ? persist_read_bool(KEY_FUZZY) 	    : key_indicator_fuzzy;
   key_indicator_bluetooth =	persist_exists(KEY_BLUETOOTH)	? persist_read_bool(KEY_BLUETOOTH) 	: key_indicator_bluetooth;
   key_indicator_vibe =		persist_exists(KEY_VIBE) 		? persist_read_bool(KEY_VIBE) 		: key_indicator_vibe;
   key_indicator_batt_img =	persist_exists(KEY_BATT_IMG) 	? persist_read_bool(KEY_BATT_IMG) 	: key_indicator_batt_img;
@@ -466,13 +465,13 @@ static void deinit(void) {
   bitmap_layer_destroy(battery_image_layer);
     
   //Save keys to persistent storage
-  persist_write_bool(KEY_INVERTED, key_indicator_inverted);
+  persist_write_bool(KEY_FUZZY,     key_indicator_fuzzy);
   persist_write_bool(KEY_BLUETOOTH, key_indicator_bluetooth);
-  persist_write_bool(KEY_VIBE, key_indicator_vibe);
-  persist_write_bool(KEY_BATT_IMG, key_indicator_batt_img);
-  persist_write_bool(KEY_TEXT_NRW, key_indicator_text_nrw);
+  persist_write_bool(KEY_VIBE,      key_indicator_vibe);
+  persist_write_bool(KEY_BATT_IMG,  key_indicator_batt_img);
+  persist_write_bool(KEY_TEXT_NRW,  key_indicator_text_nrw);
   persist_write_bool(KEY_TEXT_WIEN, key_indicator_text_wien);
-  persist_write_bool(KEY_DATE, key_indicator_date);
+  persist_write_bool(KEY_DATE,      key_indicator_date);
 }
 
 int main(void) {
