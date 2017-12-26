@@ -90,6 +90,20 @@ static GColor color_hour() {
     }
 }
 
+static void set_theme() {
+  APP_LOG(APP_LOG_LEVEL_INFO,"[Deutsch] Setting colors according to theme %d",key_indicator_theme);
+
+  window_set_background_color(window, color_bkgnd());
+
+  text_layer_set_text_color(dateLayer, color_date());
+
+  text_layer_set_text_color(minuteLayer_3lines, color_minute());
+  text_layer_set_text_color(minuteLayer_2longlines, color_minute());
+  text_layer_set_text_color(minuteLayer_2biglines, color_minute());
+
+  text_layer_set_text_color(hourLayer, color_hour());
+}
+
 //Battery - set image if charging, or set empty battery image if not charging
 static void change_battery_icon(bool charging) {
   gbitmap_destroy(battery_image);
@@ -247,12 +261,6 @@ static void process_tuple(const Tuple *t) {
   }
 }
 
-//If a Key is changing, call process_tuple
-static void in_received_handler(DictionaryIterator *iter, void *context) {
-	for(Tuple *t=dict_read_first(iter); t!=NULL; t=dict_read_next(iter))
-        process_tuple(t);
-}
-
 static void load_text_layers() {
   //Load Fonts
   GFont bitham 			= fonts_get_system_font(FONT_KEY_BITHAM_42_LIGHT);
@@ -266,21 +274,18 @@ static void load_text_layers() {
   // Configure Minute Layers
   minuteLayer_3lines = text_layer_create((GRect) { .origin = {0, 10}, .size = {XMAX, YMAX-10}});
   text_layer_set_text_alignment(minuteLayer_3lines, align);
-  text_layer_set_text_color(minuteLayer_3lines, color_minute());
   text_layer_set_background_color(minuteLayer_3lines, GColorClear);
   text_layer_set_font(minuteLayer_3lines, fonts_load_custom_font(robotoLight));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_3lines));
   
   minuteLayer_2longlines = text_layer_create((GRect) { .origin = {0, 44}, .size = {XMAX, YMAX-44}});
   text_layer_set_text_alignment(minuteLayer_2longlines, align);
-  text_layer_set_text_color(minuteLayer_2longlines, color_minute());
   text_layer_set_background_color(minuteLayer_2longlines, GColorClear);
   text_layer_set_font(minuteLayer_2longlines, fonts_load_custom_font(robotoLight));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_2longlines));
   
   minuteLayer_2biglines = text_layer_create((GRect) {.origin = {0, 23}, .size = {XMAX, YMAX-23}});
   text_layer_set_text_alignment(minuteLayer_2biglines, align);
-  text_layer_set_text_color(minuteLayer_2biglines, color_minute());
   text_layer_set_background_color(minuteLayer_2biglines, GColorClear);
   text_layer_set_font(minuteLayer_2biglines, bitham);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_2biglines));
@@ -288,14 +293,12 @@ static void load_text_layers() {
   // Configure Hour Layer
   hourLayer = text_layer_create((GRect) { .origin = {0, 109}, .size = {XMAX, YMAX-109}});
   text_layer_set_text_alignment(hourLayer, align);
-  text_layer_set_text_color(hourLayer, color_hour());
   text_layer_set_background_color(hourLayer, GColorClear);
   text_layer_set_font(hourLayer, bithamBold);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(hourLayer));
   
   // Configure DateLayer
   dateLayer = text_layer_create((GRect) { .origin = {57, -7}, .size = {XMAX-40, YMAX}});
-  text_layer_set_text_color(dateLayer, color_date());
   text_layer_set_background_color(dateLayer, GColorClear);
   text_layer_set_font(dateLayer, dateFont);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(dateLayer));
@@ -417,6 +420,17 @@ static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   ###################################
 */
 
+//If a Key is changing, call process_tuple
+static void in_received_handler(DictionaryIterator *iter, void *context) {
+  for(Tuple *t=dict_read_first(iter); t!=NULL; t=dict_read_next(iter)) {
+      process_tuple(t);
+  }
+
+  set_theme();
+  const time_t now = time(NULL);
+  display_time(localtime(&now));
+}
+
 static void window_load(Window *window) {
   //Key
   app_message_register_inbox_received(in_received_handler); //register key receiving
@@ -433,10 +447,10 @@ static void window_load(Window *window) {
   key_indicator_theme =	    persist_exists(KEY_THEME) 		? persist_read_bool(KEY_THEME) 		: key_indicator_theme;
   
   //Load Time and Text lines
-  const time_t now = time(NULL);
-  struct tm *const tick_time = localtime(&now);
   load_text_layers();
-  display_time(tick_time);
+  set_theme();
+  const time_t now = time(NULL);
+  display_time(localtime(&now));
   tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
   
   load_battery_layers();
@@ -453,7 +467,6 @@ static void window_unload(Window *window) {
 
 static void init(void) {
   window = window_create();
-  window_set_background_color(window, color_bkgnd());
   window_set_window_handlers(window, (WindowHandlers) {
     .load = window_load,
     .unload = window_unload,
