@@ -3,11 +3,6 @@
 //Window
 static Window *window;
 
-//Inverter Layer
-#ifdef NOT_YET_MIGRATED_TO_SDKv3
-static InverterLayer *inv_layer;
-#endif
-
 //Bluetooth
 static GBitmap *bluetooth_connected_image, *bluetooth_disconnected_image; //Bluetooth images
 static BitmapLayer *bluetooth_layer; //Bluetooth layer
@@ -183,9 +178,6 @@ static void process_tuple(const Tuple *t) {
     //Inverter Layer
     case KEY_INVERTED: {
       key_indicator_inverted = !strcmp(t->value->cstring,"on"); // easiest way to convert a on/off string into a boolean
-#ifdef NOT_YET_MIGRATED_TO_SDKv3
-      layer_set_hidden(inverter_layer_get_layer(inv_layer), !key_indicator_inverted);
-#endif
       break;
     }
     case KEY_BLUETOOTH: {
@@ -236,18 +228,6 @@ static void in_received_handler(DictionaryIterator *iter, void *context) {
 	for(Tuple *t=dict_read_first(iter); t!=NULL; t=dict_read_next(iter))
     process_tuple(t);
 }
-
-//Create Inverter Layer
-#ifdef NOT_YET_MIGRATED_TO_SDKv3
-static void load_inv_layer() {
-  inv_layer = inverter_layer_create((GRect) {.origin = {0, 0}, .size = {XMAX, YMAX}});
-  layer_add_child(window_get_root_layer(window), inverter_layer_get_layer(inv_layer));
-  if (key_indicator_inverted)
-    layer_set_hidden(inverter_layer_get_layer(inv_layer), false);
-  else
-    layer_set_hidden(inverter_layer_get_layer(inv_layer), true);
-}
-#endif
 
 static void load_text_layers() {
   //Load Fonts
@@ -446,15 +426,9 @@ static void window_load(Window *window) {
   
   load_battery_layers();
   load_bluetooth_layers();
-#ifdef NOT_YET_MIGRATED_TO_SDKv3
-  load_inv_layer();
-#endif
 }
 
 static void window_unload(Window *window) {
-#ifdef NOT_YET_MIGRATED_TO_SDKv3
-  inverter_layer_destroy(inv_layer);
-#endif
   text_layer_destroy(minuteLayer_3lines);
   text_layer_destroy(minuteLayer_2longlines);
   text_layer_destroy(minuteLayer_2biglines);
