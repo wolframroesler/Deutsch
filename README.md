@@ -6,7 +6,7 @@ This is is a watchface for the Pebble smartwatch that shows the current time in 
 ![Pebble Time Steel mockup](pics/mockup2.jpg)
 ![Pebble Steel mockup](pics/mockup3.jpg)
 
-The time is shown in colloquial, "fuzzy" mode: We say "Viertel nach 10" when it's only 10:12, or already 10:17.
+The time is shown in colloquial, "fuzzy" mode: We say "Viertel nach 10" when it's only 10:12 or already 10:17.
 
 Several color themes are available (selected with the configuration dialog in your phone's Pebble app). More to be added on request, or when I get more shirts.
 
@@ -35,3 +35,6 @@ Planned future changes:
 
 * Configuration options to enable/disable the changes I made to the original
 * Make it available in the Pebble store
+
+---
+*Wolfram Rösler • wolfram@roesler-ac.de • https://github.com/wolframroesler • https://twitter.com/wolframroesler • https://www.linkedin.com/in/wolframroesler/*
