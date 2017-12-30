@@ -22,7 +22,7 @@ The watchface is based on https://github.com/n3v3r001/n3v3rstextone, with the ov
 
 * Add fuzzy mode (the original would give the exact time, e. g. "sieben nach halb elf")
 * Align text to the right (since I wear the watch on the left wrist, and the left side of the watch is frequently covered by the shirt sleeve)
-* Add color themes for blue, red, and white background
+* Add color themes for blue, red, green, gray, and white background
 * Show battery icon in red when < 10 %
 * Show battery icon only when < 10 %
 * Show Bluetooth icon only when offline
