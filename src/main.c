@@ -85,10 +85,10 @@ static void set_theme() {
       break;
 
     case 3:                               // Gray
-      bkgnd   = GColorBlack;
+      bkgnd   = GColorDarkGray;
       date    = GColorWhite;
-      min     = GColorInchworm;
-      hr      = GColorPastelYellow;
+      min     = GColorPastelYellow;
+      hr      = GColorWhite;
       break;
 
     case 4:                               // White
