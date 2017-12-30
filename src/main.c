@@ -58,54 +58,49 @@ static const int red_percent = 10;
   ##################################
 */
 
-static GColor color_bkgnd() {
-    switch(key_indicator_theme) {
-        default:    return GColorBlack;         // B/W
-        case 1:     return GColorOxfordBlue;    // Blue
-        case 2:     return GColorBulgarianRose; // Red
-        case 3:     return GColorBlack;         // Gray
-    }
-}
-
-static GColor color_date() {
-    switch(key_indicator_theme) {
-        default:    return GColorWhite;         // B/W
-        case 1:     return GColorWhite;         // Blue
-        case 2:     return GColorWhite;         // Red
-        case 3:     return GColorWhite;         // Gray
-    }
-}
-
-static GColor color_minute() {
-    switch(key_indicator_theme) {
-        default:    return GColorWhite;         // B/W
-        case 1:     return GColorCeleste;       // Blue
-        case 2:     return GColorMelon;         // Red
-        case 3:     return GColorInchworm;      // Gray
-    }
-}
-
-static GColor color_hour() {
-    switch(key_indicator_theme) {
-        default:    return GColorWhite;         // B/W
-        case 1:     return GColorPastelYellow;  // Blue
-        case 2:     return GColorPastelYellow;  // Red
-        case 3:     return GColorPastelYellow;  // Gray
-    }
-}
-
 static void set_theme() {
   APP_LOG(APP_LOG_LEVEL_INFO,"[Deutsch] Setting colors according to theme %d",key_indicator_theme);
 
-  window_set_background_color(window, color_bkgnd());
+  GColor bkgnd, date, min, hr;
+  switch(key_indicator_theme) {
+    default:                              // B/W
+      bkgnd   = GColorBlack;
+      date    = GColorWhite;
+      min     = GColorWhite;
+      hr      = GColorWhite;
+      break;
 
-  text_layer_set_text_color(dateLayer, color_date());
+    case 1:                               // Blue
+        bkgnd   = GColorOxfordBlue;
+        date    = GColorWhite;
+        min     = GColorCeleste;
+        hr      = GColorPastelYellow;
+        break;
 
-  text_layer_set_text_color(minuteLayer_3lines, color_minute());
-  text_layer_set_text_color(minuteLayer_2longlines, color_minute());
-  text_layer_set_text_color(minuteLayer_2biglines, color_minute());
+    case 2:                               // Red
+      bkgnd   = GColorBulgarianRose;
+      date    = GColorWhite;
+      min     = GColorMelon;
+      hr      = GColorPastelYellow;
+      break;
 
-  text_layer_set_text_color(hourLayer, color_hour());
+    case 3:                               // Gray
+      bkgnd   = GColorBlack;
+      date    = GColorWhite;
+      min     = GColorInchworm;
+      hr      = GColorPastelYellow;
+      break;
+  }
+
+  window_set_background_color(window, bkgnd);
+
+  text_layer_set_text_color(dateLayer, date);
+
+  text_layer_set_text_color(minuteLayer_3lines, min);
+  text_layer_set_text_color(minuteLayer_2longlines, min);
+  text_layer_set_text_color(minuteLayer_2biglines, min);
+
+  text_layer_set_text_color(hourLayer, hr);
 }
 
 //Battery - set image if charging, or set empty battery image if not charging
