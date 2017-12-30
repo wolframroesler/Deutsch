@@ -71,27 +71,34 @@ static void set_theme() {
       break;
 
     case 1:                               // Blue
-        bkgnd   = GColorOxfordBlue;
-        date    = GColorWhite;
-        min     = GColorCeleste;
-        hr      = GColorPastelYellow;
-        break;
+      bkgnd   = GColorOxfordBlue;
+      date    = GColorWhite;
+      min     = GColorCeleste;
+      hr      = GColorPastelYellow;
+      break;
 
-    case 2:                               // Red
+    case 2:                               // Green
+      bkgnd   = GColorMidnightGreen;
+      date    = GColorWhite;
+      min     = GColorMintGreen;
+      hr      = GColorPastelYellow;
+      break;
+
+    case 3:                               // Red
       bkgnd   = GColorBulgarianRose;
       date    = GColorWhite;
       min     = GColorMelon;
       hr      = GColorPastelYellow;
       break;
 
-    case 3:                               // Gray
+    case 4:                               // Gray
       bkgnd   = GColorDarkGray;
       date    = GColorWhite;
       min     = GColorPastelYellow;
       hr      = GColorWhite;
       break;
 
-    case 4:                               // White
+    case 5:                               // White
       bkgnd   = GColorWhite;
       date    = GColorBlack;
       min     = GColorDarkGray;
