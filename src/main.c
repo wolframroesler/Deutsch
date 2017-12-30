@@ -90,6 +90,13 @@ static void set_theme() {
       min     = GColorInchworm;
       hr      = GColorPastelYellow;
       break;
+
+    case 4:                               // White
+      bkgnd   = GColorWhite;
+      date    = GColorBlack;
+      min     = GColorDarkGray;
+      hr      = GColorBlack;
+      break;
   }
 
   window_set_background_color(window, bkgnd);
@@ -138,7 +145,7 @@ static void update_battery(BatteryChargeState charge_state) {
 
 //draw the remaining battery percentage
 static void battery_layer_update_callback(Layer *me, GContext* ctx) {
-  const GColor color = batteryPercent <= red_percent ? GColorRed : GColorWhite;
+  const GColor color = batteryPercent <= red_percent ? GColorRed : key_indicator_theme==4 ? GColorBlack : GColorWhite;
   graphics_context_set_stroke_color(ctx, color);
   graphics_context_set_fill_color(ctx, color);
   graphics_fill_rect(ctx, GRect(2, 2, batteryPercent/100.0*11.0, 5), 0, GCornerNone);
@@ -271,33 +278,33 @@ static void load_text_layers() {
   const GTextAlignment align = key_indicator_rightalign ? GTextAlignmentRight : GTextAlignmentLeft;
     
   // Configure Minute Layers
-  minuteLayer_3lines = text_layer_create((GRect) { .origin = {0, 10}, .size = {XMAX, YMAX-10}});
+  minuteLayer_3lines = text_layer_create((GRect) { .origin = {0, 10}, .size = {XMAX-3, YMAX-10}});
   text_layer_set_text_alignment(minuteLayer_3lines, align);
   text_layer_set_background_color(minuteLayer_3lines, GColorClear);
   text_layer_set_font(minuteLayer_3lines, fonts_load_custom_font(robotoLight));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_3lines));
   
-  minuteLayer_2longlines = text_layer_create((GRect) { .origin = {0, 44}, .size = {XMAX, YMAX-44}});
+  minuteLayer_2longlines = text_layer_create((GRect) { .origin = {0, 44}, .size = {XMAX-3, YMAX-44}});
   text_layer_set_text_alignment(minuteLayer_2longlines, align);
   text_layer_set_background_color(minuteLayer_2longlines, GColorClear);
   text_layer_set_font(minuteLayer_2longlines, fonts_load_custom_font(robotoLight));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_2longlines));
   
-  minuteLayer_2biglines = text_layer_create((GRect) {.origin = {0, 23}, .size = {XMAX, YMAX-23}});
+  minuteLayer_2biglines = text_layer_create((GRect) {.origin = {0, 23}, .size = {XMAX-3, YMAX-23}});
   text_layer_set_text_alignment(minuteLayer_2biglines, align);
   text_layer_set_background_color(minuteLayer_2biglines, GColorClear);
   text_layer_set_font(minuteLayer_2biglines, bitham);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_2biglines));
   
   // Configure Hour Layer
-  hourLayer = text_layer_create((GRect) { .origin = {0, 109}, .size = {XMAX, YMAX-109}});
+  hourLayer = text_layer_create((GRect) { .origin = {0, 109}, .size = {XMAX-3, YMAX-109}});
   text_layer_set_text_alignment(hourLayer, align);
   text_layer_set_background_color(hourLayer, GColorClear);
   text_layer_set_font(hourLayer, bithamBold);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(hourLayer));
   
   // Configure DateLayer
-  dateLayer = text_layer_create((GRect) { .origin = {57, -7}, .size = {XMAX-40, YMAX}});
+  dateLayer = text_layer_create((GRect) { .origin = {57, -6}, .size = {XMAX-40, YMAX}});
   text_layer_set_background_color(dateLayer, GColorClear);
   text_layer_set_font(dateLayer, dateFont);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(dateLayer));
