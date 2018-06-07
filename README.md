@@ -30,3 +30,6 @@ Planned future changes:
 * Configuration options to enable/disable the changes I made to the original
 * Configurable colors
 * Make it available in the Pebble store
+
+---
+*Wolfram Rösler • wolfram@roesler-ac.de • https://gitlab.com/wolframroesler • https://twitter.com/wolframroesler • https://www.linkedin.com/in/wolframroesler/*
