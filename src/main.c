@@ -3,11 +3,6 @@
 //Window
 static Window *window;
 
-//Inverter Layer
-#ifdef NOT_YET_MIGRATED_TO_SDKv3
-static InverterLayer *inv_layer;
-#endif
-
 //Bluetooth
 static GBitmap *bluetooth_connected_image, *bluetooth_disconnected_image; //Bluetooth images
 static BitmapLayer *bluetooth_layer; //Bluetooth layer
@@ -22,26 +17,27 @@ static TextLayer *minuteLayer_2longlines, *minuteLayer_3lines, *minuteLayer_2big
 
 //Set key IDs
 enum {
-  KEY_INVERTED = 0,
+  KEY_FUZZY     = 0,
   KEY_BLUETOOTH = 1,
-  KEY_VIBE = 2,
-  KEY_BATT_IMG = 3,
-  KEY_TEXT_NRW = 4,
+  KEY_VIBE      = 2,
+  KEY_BATT_IMG  = 3,
+  KEY_TEXT_NRW  = 4,
   KEY_TEXT_WIEN = 5,
-  KEY_DATE = 6
+  KEY_DATE      = 6,
+  KEY_THEME     = 7,
 };
 
 //Default key values
-static bool key_indicator_inverted	= false;	//true = white background
+static bool key_indicator_fuzzy 	= true;	    //true = don't be too exact about the time
 static bool key_indicator_bluetooth	= true;		//true = bluetooth icon on
 static bool key_indicator_vibe 		= true;		//true = vibe on bluetooth disconnect
 static bool key_indicator_batt_img	= true;		//true = show batt usage image
 static bool key_indicator_text_nrw	= false;	//true = say "viertel x+1" at xx:45
 static bool key_indicator_text_wien	= false;	//true = say "viertel x+1" at xx:15
 static bool key_indicator_date		= true;		//true = show date
+static int  key_indicator_theme     = 0;        //Color Theme
 
 // The following are not yet configurable, but let's pretend they are:
-static const bool key_indicator_fuzzy = true;			// true = don't be too exact about the time
 static const bool key_indicator_batt_redonly = true;	// true = show battery icon only if red
 static const bool key_indicator_bt_offonly = true;		// true = show Bluetooth icon only if offline
 static const bool key_indicator_rightalign = true;		// true = right aligned text, false=left aligned
@@ -61,6 +57,65 @@ static const int red_percent = 10;
   ######## Custom Functions ########
   ##################################
 */
+
+static void set_theme() {
+  APP_LOG(APP_LOG_LEVEL_INFO,"[Deutsch] Setting colors according to theme %d",key_indicator_theme);
+
+  GColor bkgnd, date, min, hr;
+  switch(key_indicator_theme) {
+    default:                              // B/W
+      bkgnd   = GColorBlack;
+      date    = GColorWhite;
+      min     = GColorWhite;
+      hr      = GColorWhite;
+      break;
+
+    case 1:                               // Blue
+      bkgnd   = GColorOxfordBlue;
+      date    = GColorWhite;
+      min     = GColorCeleste;
+      hr      = GColorPastelYellow;
+      break;
+
+    case 2:                               // Green
+      bkgnd   = GColorMidnightGreen;
+      date    = GColorWhite;
+      min     = GColorMintGreen;
+      hr      = GColorPastelYellow;
+      break;
+
+    case 3:                               // Red
+      bkgnd   = GColorBulgarianRose;
+      date    = GColorWhite;
+      min     = GColorMelon;
+      hr      = GColorPastelYellow;
+      break;
+
+    case 4:                               // Gray
+      bkgnd   = GColorDarkGray;
+      date    = GColorWhite;
+      min     = GColorPastelYellow;
+      hr      = GColorWhite;
+      break;
+
+    case 5:                               // White
+      bkgnd   = GColorWhite;
+      date    = GColorBlack;
+      min     = GColorDarkGray;
+      hr      = GColorBlack;
+      break;
+  }
+
+  window_set_background_color(window, bkgnd);
+
+  text_layer_set_text_color(dateLayer, date);
+
+  text_layer_set_text_color(minuteLayer_3lines, min);
+  text_layer_set_text_color(minuteLayer_2longlines, min);
+  text_layer_set_text_color(minuteLayer_2biglines, min);
+
+  text_layer_set_text_color(hourLayer, hr);
+}
 
 //Battery - set image if charging, or set empty battery image if not charging
 static void change_battery_icon(bool charging) {
@@ -97,7 +152,7 @@ static void update_battery(BatteryChargeState charge_state) {
 
 //draw the remaining battery percentage
 static void battery_layer_update_callback(Layer *me, GContext* ctx) {
-  const GColor color = batteryPercent <= red_percent ? GColorRed : GColorWhite;
+  const GColor color = batteryPercent <= red_percent ? GColorRed : key_indicator_theme==4 ? GColorBlack : GColorWhite;
   graphics_context_set_stroke_color(ctx, color);
   graphics_context_set_fill_color(ctx, color);
   graphics_fill_rect(ctx, GRect(2, 2, batteryPercent/100.0*11.0, 5), 0, GCornerNone);
@@ -164,13 +219,12 @@ static void load_bluetooth_layers() {
 
 //If a Key is changing, do following:
 static void process_tuple(const Tuple *t) {
+  APP_LOG(APP_LOG_LEVEL_INFO,"[Deutsch] Received setting: key %lu is %s",t->key,t->value->cstring);
+
   switch(t->key) {
-    //Inverter Layer
-    case KEY_INVERTED: {
-      key_indicator_inverted = !strcmp(t->value->cstring,"on"); // easiest way to convert a on/off string into a boolean
-#ifdef NOT_YET_MIGRATED_TO_SDKv3
-      layer_set_hidden(inverter_layer_get_layer(inv_layer), !key_indicator_inverted);
-#endif
+    //Fuzzy mode
+    case KEY_FUZZY: {
+      key_indicator_fuzzy = !strcmp(t->value->cstring,"on"); // easiest way to convert a on/off string into a boolean
       break;
     }
     case KEY_BLUETOOTH: {
@@ -213,26 +267,12 @@ static void process_tuple(const Tuple *t) {
       layer_set_hidden(text_layer_get_layer(dateLayer), !key_indicator_date);
       break;
     }
+    case KEY_THEME: {
+      key_indicator_theme = atoi(t->value->cstring);
+      break;
+    }
   }
 }
-
-//If a Key is changing, call process_tuple
-static void in_received_handler(DictionaryIterator *iter, void *context) {
-	for(Tuple *t=dict_read_first(iter); t!=NULL; t=dict_read_next(iter))
-    process_tuple(t);
-}
-
-//Create Inverter Layer
-#ifdef NOT_YET_MIGRATED_TO_SDKv3
-static void load_inv_layer() {
-  inv_layer = inverter_layer_create((GRect) {.origin = {0, 0}, .size = {XMAX, YMAX}});
-  layer_add_child(window_get_root_layer(window), inverter_layer_get_layer(inv_layer));
-  if (key_indicator_inverted)
-    layer_set_hidden(inverter_layer_get_layer(inv_layer), false);
-  else
-    layer_set_hidden(inverter_layer_get_layer(inv_layer), true);
-}
-#endif
 
 static void load_text_layers() {
   //Load Fonts
@@ -245,38 +285,33 @@ static void load_text_layers() {
   const GTextAlignment align = key_indicator_rightalign ? GTextAlignmentRight : GTextAlignmentLeft;
     
   // Configure Minute Layers
-  minuteLayer_3lines = text_layer_create((GRect) { .origin = {0, 10}, .size = {XMAX, YMAX-10}});
+  minuteLayer_3lines = text_layer_create((GRect) { .origin = {0, 10}, .size = {XMAX-3, YMAX-10}});
   text_layer_set_text_alignment(minuteLayer_3lines, align);
-  text_layer_set_text_color(minuteLayer_3lines, GColorWhite);
   text_layer_set_background_color(minuteLayer_3lines, GColorClear);
   text_layer_set_font(minuteLayer_3lines, fonts_load_custom_font(robotoLight));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_3lines));
   
-  minuteLayer_2longlines = text_layer_create((GRect) { .origin = {0, 44}, .size = {XMAX, YMAX-44}});
+  minuteLayer_2longlines = text_layer_create((GRect) { .origin = {0, 44}, .size = {XMAX-3, YMAX-44}});
   text_layer_set_text_alignment(minuteLayer_2longlines, align);
-  text_layer_set_text_color(minuteLayer_2longlines, GColorWhite);
   text_layer_set_background_color(minuteLayer_2longlines, GColorClear);
   text_layer_set_font(minuteLayer_2longlines, fonts_load_custom_font(robotoLight));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_2longlines));
   
-  minuteLayer_2biglines = text_layer_create((GRect) {.origin = {0, 23}, .size = {XMAX, YMAX-23}});
+  minuteLayer_2biglines = text_layer_create((GRect) {.origin = {0, 23}, .size = {XMAX-3, YMAX-23}});
   text_layer_set_text_alignment(minuteLayer_2biglines, align);
-  text_layer_set_text_color(minuteLayer_2biglines, GColorWhite);
   text_layer_set_background_color(minuteLayer_2biglines, GColorClear);
   text_layer_set_font(minuteLayer_2biglines, bitham);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(minuteLayer_2biglines));
   
   // Configure Hour Layer
-  hourLayer = text_layer_create((GRect) { .origin = {0, 109}, .size = {XMAX, YMAX-109}});
+  hourLayer = text_layer_create((GRect) { .origin = {0, 109}, .size = {XMAX-3, YMAX-109}});
   text_layer_set_text_alignment(hourLayer, align);
-  text_layer_set_text_color(hourLayer, GColorWhite);
   text_layer_set_background_color(hourLayer, GColorClear);
   text_layer_set_font(hourLayer, bithamBold);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(hourLayer));
   
   // Configure DateLayer
-  dateLayer = text_layer_create((GRect) { .origin = {57, -7}, .size = {XMAX-40, YMAX}});
-  text_layer_set_text_color(dateLayer, GColorWhite);
+  dateLayer = text_layer_create((GRect) { .origin = {57, -6}, .size = {XMAX-40, YMAX}});
   text_layer_set_background_color(dateLayer, GColorClear);
   text_layer_set_font(dateLayer, dateFont);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(dateLayer));
@@ -286,12 +321,12 @@ static void load_text_layers() {
 //Display Time
 static void display_time(const struct tm *time) {
   //Hour Texts
-  const char *const hour_string[] = {
+  static const char *const hour_string[] = {
 	"zwölf", "eins","zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun", "zehn", "elf"
    };
 
   //Minute Texts
-  const char *const minute_string[] = {
+  static const char *const minute_string[] = {
     "\npunkt", "eins\nnach", "zwei\nnach", "drei\nnach", "vier\nnach", "fünf\nnach",
     "sechs\nnach", "sieben\nnach", "acht\nnach", "neun\nnach", "zehn\nnach",
     "elf\nnach", "zwölf\nnach", "dreizehn nach", "vierzehn nach", "viertel nach",
@@ -307,7 +342,7 @@ static void display_time(const struct tm *time) {
   };
 
   //Day of week texts
-  const char *const day_string[] = {
+  static const char *const day_string[] = {
     "so", "mo", "di", "mi", "do", "fr", "sa"
   };
   
@@ -320,23 +355,16 @@ static void display_time(const struct tm *time) {
   //Fuzzy mode, e. g. say "fünf nach drei" when it's actually already 15:07.
   if (key_indicator_fuzzy) {
 	static const int delta[] = {
-		0,		// 0
-		-1,		// 1
-		-2,		// 2
-		2,		// 3
-		1,		// 4
-		0,		// 5
-		-1,		// 6
-		-2,		// 7
-		2,		// 8
-		1		// 9
+		0,		// 0    5
+		-1,		// 1    6
+		-2,		// 2    7
+		2,		// 3    8
+		1,		// 4    9
 	};
-	min += delta[min%10];
+	min += delta[min%5];
   }
   
-  // Minute Text
-  char minute_text[50];
-  strcpy(minute_text , minute_string[min]);
+  // Configure the minute layers
   layer_set_hidden(text_layer_get_layer(minuteLayer_3lines), true);
   layer_set_hidden(text_layer_get_layer(minuteLayer_2longlines), true);
   layer_set_hidden(text_layer_get_layer(minuteLayer_2biglines), true);  
@@ -359,9 +387,9 @@ static void display_time(const struct tm *time) {
       layer_set_hidden(text_layer_get_layer(minuteLayer_2biglines), false);
   }
   
-  static char staticTimeText[50] = ""; // Needs to be static because it's used by the system later.
+  static char staticTimeText[20+1] = ""; // Needs to be static because it's used by the system later.
   staticTimeText[0] = '\0';
-  strcat(staticTimeText , minute_text);
+  strcat(staticTimeText , minute_string[min]);
   
   //Override with Special minute texts
   if (key_indicator_text_nrw && min == 45) {
@@ -376,24 +404,21 @@ static void display_time(const struct tm *time) {
   text_layer_set_text(minuteLayer_2biglines, staticTimeText);
   
   // Hour Text
-  char hour_text[50];
+  static char staticHourText[10+1] = ""; // Needs to be static because it's used by the system later.
   if (min <= 20) {
     if (min == 15 && key_indicator_text_wien) { //Override with Special minute texts
-      strcpy(hour_text , hour_string[(hour + 1) % 12]);
+      strcpy(staticHourText, hour_string[(hour + 1) % 12]);
     } else {
-      strcpy(hour_text , hour_string[hour % 12]);
+      strcpy(staticHourText , hour_string[hour % 12]);
     }
   } else {
-    strcpy(hour_text , hour_string[(hour + 1) % 12]);
+    strcpy(staticHourText , hour_string[(hour + 1) % 12]);
   }
   
-  static char staticHourText[50] = ""; // Needs to be static because it's used by the system later.
-  staticHourText[0] = '\0';
-  strcat(staticHourText , hour_text);
   text_layer_set_text(hourLayer, staticHourText);
   
   // Weekday
-  static char staticDateText[16];
+  static char staticDateText[5+1];
   snprintf(staticDateText, sizeof(staticDateText), "%s %i", day_string[wday], mday);
   text_layer_set_text(dateLayer, staticDateText);
 }
@@ -408,38 +433,44 @@ static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   ###################################
 */
 
+//If a Key is changing, call process_tuple
+static void in_received_handler(DictionaryIterator *iter, void *context) {
+  for(Tuple *t=dict_read_first(iter); t!=NULL; t=dict_read_next(iter)) {
+      process_tuple(t);
+  }
+
+  set_theme();
+  const time_t now = time(NULL);
+  display_time(localtime(&now));
+}
+
 static void window_load(Window *window) {
   //Key
   app_message_register_inbox_received(in_received_handler); //register key receiving
-	app_message_open(512, 512); //Key buffer in- and outbound
+  app_message_open(512, 512); //Key buffer in- and outbound
   
   //Load value from storage, if storage is empty load default value
-  key_indicator_inverted =	persist_exists(KEY_INVERTED) 	? persist_read_bool(KEY_INVERTED) 	: key_indicator_inverted;
+  key_indicator_fuzzy =	    persist_exists(KEY_FUZZY) 	    ? persist_read_bool(KEY_FUZZY) 	    : key_indicator_fuzzy;
   key_indicator_bluetooth =	persist_exists(KEY_BLUETOOTH)	? persist_read_bool(KEY_BLUETOOTH) 	: key_indicator_bluetooth;
   key_indicator_vibe =		persist_exists(KEY_VIBE) 		? persist_read_bool(KEY_VIBE) 		: key_indicator_vibe;
   key_indicator_batt_img =	persist_exists(KEY_BATT_IMG) 	? persist_read_bool(KEY_BATT_IMG) 	: key_indicator_batt_img;
   key_indicator_text_nrw =	persist_exists(KEY_TEXT_NRW) 	? persist_read_bool(KEY_TEXT_NRW) 	: key_indicator_text_nrw;
   key_indicator_text_wien =	persist_exists(KEY_TEXT_WIEN) 	? persist_read_bool(KEY_TEXT_WIEN)	: key_indicator_text_wien;
   key_indicator_date =		persist_exists(KEY_DATE) 		? persist_read_bool(KEY_DATE) 		: key_indicator_date;
+  key_indicator_theme =	    persist_exists(KEY_THEME) 		? persist_read_bool(KEY_THEME) 		: key_indicator_theme;
   
   //Load Time and Text lines
-  const time_t now = time(NULL);
-  struct tm *const tick_time = localtime(&now);
   load_text_layers();
-  display_time(tick_time);
+  set_theme();
+  const time_t now = time(NULL);
+  display_time(localtime(&now));
   tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
   
   load_battery_layers();
   load_bluetooth_layers();
-#ifdef NOT_YET_MIGRATED_TO_SDKv3
-  load_inv_layer();
-#endif
 }
 
 static void window_unload(Window *window) {
-#ifdef NOT_YET_MIGRATED_TO_SDKv3
-  inverter_layer_destroy(inv_layer);
-#endif
   text_layer_destroy(minuteLayer_3lines);
   text_layer_destroy(minuteLayer_2longlines);
   text_layer_destroy(minuteLayer_2biglines);
@@ -449,7 +480,6 @@ static void window_unload(Window *window) {
 
 static void init(void) {
   window = window_create();
-  window_set_background_color(window, GColorBlack);
   window_set_window_handlers(window, (WindowHandlers) {
     .load = window_load,
     .unload = window_unload,
@@ -477,13 +507,14 @@ static void deinit(void) {
   bitmap_layer_destroy(battery_image_layer);
     
   //Save keys to persistent storage
-  persist_write_bool(KEY_INVERTED, key_indicator_inverted);
+  persist_write_bool(KEY_FUZZY,     key_indicator_fuzzy);
   persist_write_bool(KEY_BLUETOOTH, key_indicator_bluetooth);
-  persist_write_bool(KEY_VIBE, key_indicator_vibe);
-  persist_write_bool(KEY_BATT_IMG, key_indicator_batt_img);
-  persist_write_bool(KEY_TEXT_NRW, key_indicator_text_nrw);
+  persist_write_bool(KEY_VIBE,      key_indicator_vibe);
+  persist_write_bool(KEY_BATT_IMG,  key_indicator_batt_img);
+  persist_write_bool(KEY_TEXT_NRW,  key_indicator_text_nrw);
   persist_write_bool(KEY_TEXT_WIEN, key_indicator_text_wien);
-  persist_write_bool(KEY_DATE, key_indicator_date);
+  persist_write_bool(KEY_DATE,      key_indicator_date);
+  persist_write_int (KEY_THEME,     key_indicator_theme);
 }
 
 int main(void) {

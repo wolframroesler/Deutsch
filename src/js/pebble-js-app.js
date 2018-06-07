@@ -10,7 +10,7 @@ Pebble.addEventListener("showConfiguration", function(){
   console.log("URL: creating configuration URL");
 
   //default URL
-  var url = 'http://n3v3r001.at/pebble/configs/n3v3rs_text_one.html?';
+  var url = 'http://www.roesler-ac.de/watchface-deutsch-config.html?';
 
   //starting with first key
   var firstKey = true; 
@@ -48,13 +48,14 @@ Pebble.addEventListener("webviewclosed", function(e) {
   console.log("Trace: Options Recorded - " + JSON.stringify(options));
 
   var dict = {
-    0: options.KEY_INVERTED,
+    0: options.KEY_FUZZY,
     1: options.KEY_BLUETOOTH,
     2: options.KEY_VIBE,
     3: options.KEY_BATT_IMG,
     4: options.KEY_TEXT_NRW,
     5: options.KEY_TEXT_WIEN,
-    6: options.KEY_DATE
+    6: options.KEY_DATE,
+    7: options.KEY_THEME
   };
 
   console.log("Trace: Dict Sending - " + JSON.stringify(dict));
