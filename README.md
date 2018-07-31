@@ -29,7 +29,7 @@ The watchface is based on https://github.com/n3v3r001/n3v3rstextone, with the ov
 * Migrate to Pebble SDK 3
 * Change the name from ""n3v3rs text one" to "Deutsch"
 
-To install the watchface on your Pebble, use the Pebble SDK as described on https://developer.pebble.com/tutorials/watchface-tutorial/part1/.
+To install the watchface on your Pebble, upload `Deutsch.pbw` using the Pebble app on your smartphone, or build and install the watchface with the Pebble SDK as described on https://developer.pebble.com/tutorials/watchface-tutorial/part1/.
 
 Planned future changes:
 
