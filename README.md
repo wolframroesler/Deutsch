@@ -27,9 +27,9 @@ The watchface is based on https://github.com/n3v3r001/n3v3rstextone, with the ov
 * Show battery icon only when < 10 %
 * Show Bluetooth icon only when offline
 * Migrate to Pebble SDK 3
-* Change the name from ""n3v3rs text one" to "Deutsch"
+* Change the name from "n3v3rs text one" to "Deutsch"
 
-To install the watchface on your Pebble, upload `Deutsch.pbw` using the Pebble app on your smartphone, or build and install the watchface with the Pebble SDK as described on https://developer.pebble.com/tutorials/watchface-tutorial/part1/.
+To install the watchface on your Pebble, upload `Deutsch.pbw` using the Pebble app on your smartphone, or build and install the watchface with the Pebble SDK as described on https://developer.rebble.io/developer.pebble.com/tutorials/watchface-tutorial/part1/index.html.
 
 Planned future changes:
 
